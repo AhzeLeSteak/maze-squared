@@ -4,6 +4,8 @@ import {Canvas} from './Canvas/Abstract/Canvas';
 import {CanvasRaycast} from './Canvas/CanvasRaycast';
 import {Controller} from './Controller';
 import {CanvasTopView} from "./Canvas/CanvasTopView";
+import {getAllTexture, textures} from "./Texture/load_textures";
+import {environment} from "./main/environments/environment";
 
 export class Game {
 
@@ -11,6 +13,8 @@ export class Game {
 	public readonly player: Player;
 	public readonly map: GameMap;
 	private readonly controller: Controller;
+
+	private interval: any;
 
 
 	public readonly view_angle = 90;
@@ -32,6 +36,26 @@ export class Game {
 		];
 
 	}
+
+
+	init() {
+		console.log('Waiting for textures to load');
+		return getAllTexture().then(() => {
+			console.log('Textures loaded', textures);
+		});
+	}
+
+
+	loop(): void {
+		this.interval = setTimeout(() => this.loop(), 1000 / environment.fps)
+		this.update();
+		this.render();
+	}
+
+	stop(): void {
+		clearTimeout(this.interval);
+	}
+
 
 	render(): void {
 		this.renderers.forEach(r => r.drawContext(this));

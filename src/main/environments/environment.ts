@@ -5,12 +5,12 @@ import {Env} from "./abstract_environment";
 
 
 export const environment: Env = {
-  production: false,
-  fps: 24,
-  debug: true,
-  drawRays: true,
-  draw3d: true,
-  highlightPlayerTile: true,
+	production: false,
+	fps: 40,
+	debug: true,
+	drawRays: true,
+	draw3d: true,
+	highlightPlayerTile: true,
 };
 
 /*
