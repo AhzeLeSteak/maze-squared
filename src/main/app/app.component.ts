@@ -8,9 +8,10 @@ import {Game} from '../../Game';
 })
 export class AppComponent implements AfterViewInit {
 
-	private game: Game = new Game();
+	private game!: Game;
 
 	ngAfterViewInit(): void {
+		this.game = new Game();
 		this.game.init()
 			.then(() => this.game.loop());
 

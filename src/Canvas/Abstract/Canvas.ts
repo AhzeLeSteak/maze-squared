@@ -12,7 +12,8 @@ export abstract class Canvas {
 		this.size.y = Math.floor(this.size.y);
 	}
 
-	public abstract drawContext(context: Game): void;
+	public abstract drawContext(context: Game, dt: number): void;
+
 	protected abstract reset(): void;
 
 

@@ -10,10 +10,9 @@ export class GameMap {
 		playerPos: Vector2
 	} = {
 		boxes: [],
-		playerPos: infinite
+		playerPos: {x: 5, y: 5}
 	};
 
-	tp_angles: Map<number, number>;
 
 	size: Vector2 = {
 		x: 10,
@@ -21,7 +20,6 @@ export class GameMap {
 	};
 
 	constructor() {
-		this.tp_angles = new Map<number, number>();
 		this.load();
 	}
 
@@ -34,20 +32,17 @@ export class GameMap {
 	}
 
 	public load(): void {
-		if (localStorage.getItem('map_info') === null) {
-			for(let y = 0; y < this.size.y; y++){
-				for(let x = 0; x < this.size.x; x++){
-					this.map_info.boxes.push(y == 0 || x == 0 || y == this.size.y -1 || x == this.size.x - 1 ? 1 : 0);
-				}
-			}
-			this.map_info.playerPos = {
-				x: this.size.x/2,
-				y: this.size.y/2
-			};
-		} else {
-			this.map_info = JSON.parse(localStorage.getItem('map_info') as string);
-		}
-
+		this.map_info.boxes = [
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+			1, 2, 1, 0, 0, 0, 0, 1, 3, 1,
+			1, 0, 1, 0, 0, 0, 0, 0, 0, 1,
+			1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+			1, 0, 1, 0, 0, 0, 0, 0, 0, 1,
+			1, 2, 1, 0, 0, 0, 0, 0, 0, 1,
+			1, 1, 1, 0, 0, 0, 0, 0, 0, 1,
+			1, 1, 1, 3, 1, 0, 0, 0, 0, 1,
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		];
 	}
 
 	to_index(v: Vector2): number {

@@ -15,9 +15,8 @@ export class Game {
 	private readonly controller: Controller;
 
 	private interval: any;
-
-
-	public readonly view_angle = 90;
+	public readonly view_angle = 80;
+	private last_tick = 0;
 	private renderers: Array<Canvas>;
 
 	constructor() {
@@ -31,8 +30,8 @@ export class Game {
 		this.map = new GameMap();
 		this.player = new Player(this.map.map_info.playerPos);
 		this.renderers = [
-			new CanvasRaycast(500),
-			new CanvasTopView(this.map.size, this, 64)
+			new CanvasRaycast(window.innerWidth * .9, window.innerHeight * .9),
+			//new CanvasTopView(this.map.size, this, 64)
 		];
 
 	}
@@ -48,8 +47,12 @@ export class Game {
 
 	loop(): void {
 		this.interval = setTimeout(() => this.loop(), 1000 / environment.fps)
-		this.update();
-		this.render();
+
+		const new_tick = new Date().getTime() / 1000;
+		const delta = new_tick - this.last_tick;
+		this.last_tick = new_tick;
+		this.update(delta);
+		this.render(delta);
 	}
 
 	stop(): void {
@@ -57,12 +60,12 @@ export class Game {
 	}
 
 
-	render(): void {
-		this.renderers.forEach(r => r.drawContext(this));
+	render(dt: number): void {
+		this.renderers.forEach(r => r.drawContext(this, dt));
 	}
 
-	update(): void {
-		this.controller.update();
+	update(dt: number): void {
+		this.controller.update(dt);
 		this.player.update(this.map);
 	}
 

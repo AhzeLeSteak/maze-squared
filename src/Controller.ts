@@ -1,4 +1,4 @@
-import {degreToRadian} from './utils';
+import {degreToRadian, pi, pi_over_2} from './utils';
 import {Game} from './Game';
 import {environment} from './main/environments/environment';
 
@@ -14,19 +14,22 @@ export class Controller {
 		this.bindEvents();
 	}
 
-	update(): void {
-		const speed = this.game.player.speed;
-		if (this.RIGHT) {
-			this.game.player.addAngle(degreToRadian * speed * 64);
-		} else if (this.LEFT) {
-			this.game.player.addAngle(-degreToRadian * speed * 64);
-		}
+	update(dt: number): void {
+		const speed = this.game.player.rotation_speed;
+		if (this.RIGHT)
+			this.game.player.addAngle(degreToRadian * speed * dt);
+		else if (this.LEFT)
+			this.game.player.addAngle(-degreToRadian * speed * dt);
 
-		if (this.UP) {
-			this.game.player.walk(this.game.map, true);
-		} else if (this.DOWN) {
-			this.game.player.walk(this.game.map, false);
-		}
+		if (this.STRAFE_LEFT)
+			this.game.player.walk(this.game.map, dt, this.game.player.angle - pi_over_2);
+		else if (this.STRAFE_RIGHT)
+			this.game.player.walk(this.game.map, dt, this.game.player.angle + pi_over_2);
+
+		if (this.UP)
+			this.game.player.walk(this.game.map, dt);
+		else if (this.DOWN)
+			this.game.player.walk(this.game.map, dt, this.game.player.angle + pi);
 	}
 
 	bindEvents(): void {
@@ -45,7 +48,7 @@ export class Controller {
 				case 'KeyD':
 					this.RIGHT = val;
 					break;
-				case 'KeyA':
+				case 'KeyQ':
 					this.STRAFE_LEFT = val;
 					break;
 				case 'KeyE':

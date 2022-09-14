@@ -3,13 +3,14 @@ import {Canvas} from "./Canvas";
 
 type Color = {r: number, g: number, b: number};
 
-export abstract class CanvasWebGL extends Canvas{
+export abstract class CanvasWebGL extends Canvas {
 
 	protected gl: WebGL2RenderingContext;
 	private shaderProgram !: WebGLProgram;
-	private color : Color = {r: 0, g: 0, b: 0};
+	private color: Color = {r: 0, g: 0, b: 0};
 
-	private lines = [] as number[];
+	private lines_vertex = [] as number[];
+	private triangle_vertex = [] as number[];
 
 	protected constructor(size: Vector2) {
 		super(size);
@@ -17,7 +18,7 @@ export abstract class CanvasWebGL extends Canvas{
 		this.setupWebGl();
 	}
 
-	private setupWebGl(){
+	private setupWebGl() {
 		const gl = this.gl;
 		const vertexShaderSource =
 			`#version 300 es
@@ -69,17 +70,24 @@ export abstract class CanvasWebGL extends Canvas{
 		gl.clear(gl.COLOR_BUFFER_BIT);
 	}
 
-	private deviceToNormalised(point: number, horizontal: boolean){
+	private deviceToNormalised(point: number, horizontal: boolean) {
 		return horizontal
-			? 2*point/this.canvas.width - 1
-			: -2*point/this.canvas.height + 1;
+			? 2 * point / this.canvas.width - 1
+			: -2 * point / this.canvas.height + 1;
 	}
+
+	protected setColor(red: number, green: number, blue: number) {
+		this.color.r = red;
+		this.color.g = green;
+		this.color.b = blue;
+	}
+
 
 	protected drawHorizontalLine(x: number, y1: number, y2: number): void {
 		x = this.deviceToNormalised(x, true);
 		y1 = this.deviceToNormalised(y1, false);
 		y2 = this.deviceToNormalised(y2, false);
-		this.lines.push(
+		this.lines_vertex.push(
 			// First line
 			x, y1,               // Coordinate
 			this.color.r, this.color.g, this.color.b,    // Color
@@ -89,29 +97,51 @@ export abstract class CanvasWebGL extends Canvas{
 		);
 	}
 
+	protected drawRectangle(x: number, y: number, width: number, height: number): void {
+		const xLeft = this.deviceToNormalised(x, true);
+		const xRight = this.deviceToNormalised(x + width, true);
+		const yUp = this.deviceToNormalised(y, false);
+		const yDown = this.deviceToNormalised(y + height, false);
+		this.triangle_vertex.push(
+			//triangle 1
+			//vertex 1
+			xLeft, yUp, this.color.r, this.color.g, this.color.b,
+			//vertex 2
+			xRight, yUp, this.color.r, this.color.g, this.color.b,
+			//vertex 3
+			xLeft, yDown, this.color.r, this.color.g, this.color.b,
+			//triangle 2
+			//vertex 1
+			xRight, yUp, this.color.r, this.color.g, this.color.b,
+			//vertex 2
+			xLeft, yDown, this.color.r, this.color.g, this.color.b,
+			//vertex 3
+			xRight, yDown, this.color.r, this.color.g, this.color.b,
+		)
 
-	protected setColor(red: number, green: number, blue: number) {
-		this.color.r = red;
-		this.color.g = green;
-		this.color.b = blue;
+
 	}
 
 	protected reset(): void {
 		this.gl.clearColor(1, 1, 1, 1);
-		this.lines = [];
+		this.lines_vertex = [];
+		this.triangle_vertex = [];
 	}
 
-	protected finishDrawing(){
+	protected finishDrawing() {
 		this.finishLines();
-		//this.finishRect();
+		this.finishRect();
+
+		//console.log(this.triangle_vertex.length)
 
 		//332486
 		//125238
 	}
 
 	private finishLines(){
+		if (this.lines_vertex.length === 0) return;
 		const gl = this.gl;
-		const verticesAndColors = new Float32Array(this.lines);
+		const verticesAndColors = new Float32Array(this.lines_vertex);
 
 		const vbo = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
@@ -128,7 +158,30 @@ export abstract class CanvasWebGL extends Canvas{
 		gl.enableVertexAttribArray(a_Color);
 
 
-		gl.drawArrays(gl.LINES, 0, verticesAndColors.length/5);
+		gl.drawArrays(gl.LINES, 0, verticesAndColors.length / 5);
+	}
+
+	private finishRect() {
+		if (this.triangle_vertex.length === 0) return;
+		const gl = this.gl;
+		const verticesAndColors = new Float32Array(this.triangle_vertex);
+
+		const vbo = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+		gl.bufferData(gl.ARRAY_BUFFER, verticesAndColors, gl.STATIC_DRAW);
+
+		const FSIZE = verticesAndColors.BYTES_PER_ELEMENT;
+
+		const a_Position = gl.getAttribLocation(this.shaderProgram, "a_Position");
+		gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 5 * FSIZE, 0);
+		gl.enableVertexAttribArray(a_Position);
+
+		const a_Color = gl.getAttribLocation(this.shaderProgram, "a_Color");
+		gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, 5 * FSIZE, 2 * FSIZE);
+		gl.enableVertexAttribArray(a_Color);
+
+
+		gl.drawArrays(gl.TRIANGLES, 0, verticesAndColors.length / 5);
 	}
 
 

@@ -1,12 +1,7 @@
-/* You can add global styles to this file, and also import other style files */
-#canvasContainer {
-	position: relative;
-}
-
 .abs {
 	background-color: transparent; /* needed because webgl-tutoraisl.css sets canvas bg color to white */
 	position: absolute;
-	left: 0px;
-	top: 0px;
+	left: 5vw;
+	top: 5vh;
 	z-index: 10;
 }
