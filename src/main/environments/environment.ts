@@ -3,8 +3,6 @@ import {Env} from "./abstract_environment";
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
-// @ts-ignore
-const config = require('../../../package.json');
 
 export const environment: Env = {
   production: false,
@@ -13,7 +11,6 @@ export const environment: Env = {
   drawRays: true,
   draw3d: true,
   highlightPlayerTile: true,
-  version: config.version
 };
 
 /*

@@ -15,7 +15,6 @@ export class AppComponent implements AfterViewInit {
 	private interval!: Timeout;
 	private fps = environment.fps;
 	private game !: Game;
-	public version = environment.version;
 	public prod = environment.production
 
 	ngAfterViewInit(): void {

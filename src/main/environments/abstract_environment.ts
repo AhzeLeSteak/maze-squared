@@ -5,5 +5,4 @@ export type Env = {
   drawRays: boolean,
   draw3d: boolean,
   highlightPlayerTile: boolean,
-  version: string
 };

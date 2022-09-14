@@ -20,17 +20,17 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/raycasted",
-            "index": "src/main/index.html",
-            "main": "src/main/main.ts",
-            "polyfills": "src/main/polyfills.ts",
-            "tsConfig": "tsconfig.app.json",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-            ],
+			  "outputPath": "build",
+			  "index": "src/main/index.html",
+			  "main": "src/main/main.ts",
+			  "polyfills": "src/main/polyfills.ts",
+			  "tsConfig": "tsconfig.app.json",
+			  "assets": [
+				  "src/favicon.ico",
+				  "src/assets"
+			  ],
+			  "styles": [
+			  ],
             "scripts": []
           },
           "configurations": {
