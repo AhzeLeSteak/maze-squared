@@ -1,5 +1,24 @@
-# Maze²
+# maze-squared
 
-Maze² is a game project made using 3DSage tutorial (
-c.f. [this video](https://www.youtube.com/watch?v=gYRrGTC7GtA&feature=youtu.be))
+## Project setup
+```
+npm install
+```
 
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
+
+### Compiles and minifies for production
+```
+npm run build
+```
+
+### Lints and fixes files
+```
+npm run lint
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
