@@ -1,4 +1,4 @@
-import {degreToRadian, pi, pi_over_2} from './utils';
+import {degreToRadian, pi, pi_over_2, pi_over_4} from './utils';
 import {Game} from './Game';
 import {environment} from './main/environments/environment';
 
@@ -21,15 +21,27 @@ export class Controller {
 		else if (this.LEFT)
 			this.game.player.addAngle(-degreToRadian * speed * dt);
 
-		if (this.STRAFE_LEFT)
-			this.game.player.walk(this.game.map, dt, this.game.player.angle - pi_over_2);
-		else if (this.STRAFE_RIGHT)
-			this.game.player.walk(this.game.map, dt, this.game.player.angle + pi_over_2);
+		const side = this.STRAFE_LEFT || this.STRAFE_RIGHT;
+		const forward = this.UP || this.DOWN;
+		if (!side && !forward) return;
 
-		if (this.UP)
-			this.game.player.walk(this.game.map, dt);
-		else if (this.DOWN)
-			this.game.player.walk(this.game.map, dt, this.game.player.angle + pi);
+		let delta_speed = 1;
+		let diff_angle = 0;
+		let base_angle = this.game.player.angle;
+
+		if (side) //si on
+			diff_angle = this.STRAFE_RIGHT ? pi_over_2 : -pi_over_2;
+		if (forward) {
+			if (this.DOWN)
+				base_angle += pi;
+			if (side) { //diagonal movement
+				diff_angle /= this.DOWN ? -2 : 2; //45° angle
+				delta_speed = 1 / Math.sqrt(2); //waling speed divided by sqrt(2) (pythagorean theorem)
+			}
+		}
+
+		this.game.player.walk(this.game.map, dt * delta_speed, base_angle + diff_angle);
+
 	}
 
 	bindEvents(): void {
@@ -42,16 +54,16 @@ export class Controller {
 				case 'KeyS':
 					this.DOWN = val;
 					break;
-				case 'KeyA':
+				case 'KeyQ':
 					this.LEFT = val;
 					break;
-				case 'KeyD':
+				case 'KeyE':
 					this.RIGHT = val;
 					break;
-				case 'KeyQ':
+				case 'KeyA':
 					this.STRAFE_LEFT = val;
 					break;
-				case 'KeyE':
+				case 'KeyD':
 					this.STRAFE_RIGHT = val;
 					break;
 			}
@@ -78,7 +90,8 @@ export class Controller {
 					}
 					break;
 				case 'C':
-					environment.draw3d = !environment.draw3d;
+					if (!environment.production)
+						environment.draw3d = !environment.draw3d;
 			}
 		});
 	}

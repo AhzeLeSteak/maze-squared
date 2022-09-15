@@ -5,7 +5,7 @@ export abstract class Canvas2D extends Canvas{
 
 	protected contextd2D: CanvasRenderingContext2D;
 
-	constructor(size: Vector2) {
+	protected constructor(size: Vector2) {
 		super(size);
 		const context = this.canvas.getContext('2d') as CanvasRenderingContext2D;
 		context.lineCap = 'round';

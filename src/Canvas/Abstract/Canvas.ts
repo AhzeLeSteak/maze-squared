@@ -17,16 +17,14 @@ export abstract class Canvas {
 	protected abstract reset(): void;
 
 
-	protected createCanvas(cssClass ?: string): HTMLCanvasElement {
+	protected createCanvas(): HTMLCanvasElement {
 		const id = 'canvas_' + Canvas.id++;
 		const canvasElement = document.createElement('canvas');
 		canvasElement.setAttribute('id', id);
 		canvasElement.setAttribute('width', this.size.x + '');
 		canvasElement.setAttribute('height', this.size.y + '');
 		canvasElement.setAttribute('style', 'border: 3px solid black');
-		(document.getElementById('canvasContainer') as HTMLElement).appendChild(canvasElement);
-		if (cssClass)
-			canvasElement.classList.add(cssClass);
+		(document.getElementById('canvas-container') as HTMLElement).appendChild(canvasElement);
 		return canvasElement;
 	}
 

@@ -1,7 +1,11 @@
-.abs {
-	background-color: transparent; /* needed because webgl-tutoraisl.css sets canvas bg color to white */
-	position: absolute;
-	left: 5vw;
-	top: 5vh;
-	z-index: 10;
+#canvas-container canvas {
+	background-color: transparent;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+#canvas-container .tools {
+	left: 25vw;
 }

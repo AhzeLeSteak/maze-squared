@@ -9,7 +9,7 @@ export class Player {
 	 */
 	public angle = -pi_over_2;
 	public readonly speed = 2; //tile per second
-	public readonly rotation_speed = 160; // deg per second
+	public readonly rotation_speed = 120; // deg per second
 	private box_type = 0;
 
 	constructor(public pos: Vector2) {
@@ -25,15 +25,12 @@ export class Player {
 	walk(map: GameMap, dt: number, angle = this.angle): void {
 		let nextPoint = this.getNextPointWalking(dt, angle);
 		const old_pos: Vector2 = {...this.pos};
-		if (map.box(nextPoint.x, nextPoint.y) !== 1) {
-			nextPoint = this.getNextPointWalking(dt, angle);
+		if (map.box(nextPoint.x, nextPoint.y, true) !== 1) {
 			this.pos.x = nextPoint.x;
 			this.pos.y = nextPoint.y;
-		} else if (map.box(this.pos.x, nextPoint.y) !== 1) {
-			nextPoint = this.getNextPointWalking(dt, angle);
+		} else if (map.box(this.pos.x, nextPoint.y, true) !== 1) {
 			this.pos.y = nextPoint.y;
-		} else if (map.box(nextPoint.x, this.pos.y) !== 1) {
-			nextPoint = this.getNextPointWalking(dt, angle);
+		} else if (map.box(nextPoint.x, this.pos.y, true) !== 1) {
 			this.pos.x = nextPoint.x;
 		}
 

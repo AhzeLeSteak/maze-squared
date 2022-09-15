@@ -40,6 +40,7 @@ export class GameMap {
 			1, 0, 1, 0, 0, 0, 0, 0, 0, 1,
 			1, 2, 1, 0, 0, 0, 0, 0, 0, 1,
 			1, 1, 1, 0, 0, 0, 0, 0, 0, 1,
+			1, 1, 1, 0, 0, 0, 0, 0, 0, 1,
 			1, 1, 1, 3, 1, 0, 0, 0, 0, 1,
 			1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 		];
@@ -50,10 +51,12 @@ export class GameMap {
 	}
 
 
-	box(x: number, y: number): number {
+	box(x: number, y: number, can_oob = false): number {
 		x = Math.floor(x);
 		y = Math.floor(y);
 		if (this.isOutOfBound({x, y})) {
+			if (can_oob)
+				return 1;
 			throw new Error(`Out of bound : {x:${x}, y:${y}}`);
 		}
 		return this.boxes[x + y * this.size.x];
@@ -115,7 +118,7 @@ export class GameMap {
 			}
 
 			squaresToDraw.push({x: Math.floor(nx) + dx, y: Math.floor(ny) + dy});
-			return this.box(Math.floor(nx) + dx, Math.floor(ny) + dy);
+			return this.box(Math.floor(nx) + dx, Math.floor(ny) + dy, true);
 		};
 
 		let dist = 0;

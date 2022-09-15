@@ -9,31 +9,23 @@ import {environment} from "./main/environments/environment";
 
 export class Game {
 
-	static singleton = false;
 	public readonly player: Player;
 	public readonly map: GameMap;
 	private readonly controller: Controller;
 
+	public edit_mode = false;
+	private renderers: Array<Canvas> = [];
+
 	private interval: any;
 	public readonly view_angle = 80;
 	private last_tick = 0;
-	private renderers: Array<Canvas>;
 
 	constructor() {
 		console.log('Instanciating Game class');
-		if (Game.singleton) {
-			throw new Error('Game class can\'t be instanciated several times');
-		} else {
-			Game.singleton = true;
-		}
 		this.controller = new Controller(this);
 		this.map = new GameMap();
 		this.player = new Player(this.map.map_info.playerPos);
-		this.renderers = [
-			new CanvasRaycast(window.innerWidth * .9, window.innerHeight * .9),
-			//new CanvasTopView(this.map.size, this, 64)
-		];
-
+		this.toggle();
 	}
 
 
@@ -59,6 +51,13 @@ export class Game {
 		clearTimeout(this.interval);
 	}
 
+	toggle() {
+		document.querySelectorAll('#canvas-container canvas').forEach(e => e.remove())
+		this.edit_mode = !this.edit_mode;
+		this.renderers = this.edit_mode
+			? [new CanvasTopView(this.map.size, this, 64)]
+			: [new CanvasRaycast(window.innerWidth * .8, window.innerHeight * .8)];
+	}
 
 	render(dt: number): void {
 		this.renderers.forEach(r => r.drawContext(this, dt));

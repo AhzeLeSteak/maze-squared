@@ -19,10 +19,9 @@ export class CanvasRaycast extends CanvasWebGL {
 
 	constructor(width: number, height ?: number) {
 		super({x: width, y: height || width * 9 / 16});
-		this.context2D = this.createCanvas('abs').getContext('2d')!;
+		this.context2D = this.createCanvas().getContext('2d')!;
 		this.context2D.font = '16px Comic sans';
 		this.context2D.fillStyle = 'yellow';
-		this.canvas.classList.add('abs')
 
 		webglUtils.resizeCanvasToDisplaySize(this.gl.canvas);
 		webglUtils.resizeCanvasToDisplaySize(this.context2D.canvas);

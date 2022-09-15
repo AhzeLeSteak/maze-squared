@@ -7,16 +7,24 @@ import {Canvas2D} from "./Abstract/Canvas2D";
 
 export class CanvasTopView extends Canvas2D {
 
-	private lvlEditor: LevelEditor;
+	private lvl_editor: LevelEditor;
 	private last_player_pos: Vector2;
+
+	private tools_context2D: CanvasRenderingContext2D;
 
 	constructor(size: Vector2, game: Game, public readonly tile_size: number) {
 		super({
 			x: size.y * tile_size,
-			y: size.y * tile_size + tile_size
+			y: size.y * tile_size
 		});
-		this.lvlEditor = new LevelEditor(this.canvas, this.tile_size, game);
+		this.lvl_editor = new LevelEditor(this.canvas, this.tile_size, game);
 		this.last_player_pos = {x: Infinity, y: Infinity};
+
+		this.tools_context2D = this.createCanvas().getContext('2d')!;
+		const canvas = this.tools_context2D.canvas;
+		canvas.width = tile_size * 2;
+		canvas.height = tile_size * 6;
+		canvas.classList.add('tools');
 	}
 
 
@@ -46,15 +54,6 @@ export class CanvasTopView extends Canvas2D {
 					this.contextd2D.strokeText('' + (box_type - 1), (x + 0.45) * this.tile_size, (y + 0.6) * this.tile_size);
 				}
 			}
-		}
-
-
-		for (let i = 0; i < 8; i++) {
-			const text = ['Save', 'Load', 'Ground', 'Wall', 'TP1', 'TP2', 'TP3', 'TP4'][i];
-			this.contextd2D.strokeStyle = this.lvlEditor.type + 2 === i ? 'red' : 'black';
-			this.contextd2D.strokeRect(i * this.tile_size + 1, this.size.y - this.tile_size + 1, this.tile_size - 2, this.tile_size - 2);
-			this.contextd2D.strokeText(text, i * this.tile_size + 0.1 * this.tile_size,
-				this.size.y - this.tile_size * 0.4, this.tile_size * 0.9);
 		}
 
 
