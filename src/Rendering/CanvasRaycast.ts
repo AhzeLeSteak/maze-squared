@@ -4,7 +4,6 @@ import { textures } from "@/Engine/Texture/load_textures";
 import { Pixel } from "@/Engine/Texture/Texture";
 import { CanvasWebGL } from "./Abstract/CanvalWebGL";
 
-declare let webglUtils: any;
 
 const SAMPLE_SIZE = 50;
 let tick_index = 0;
@@ -18,21 +17,14 @@ export class CanvasRaycast extends CanvasWebGL {
   constructor(width: number, height?: number) {
     super({ x: width, y: height || (width * 9) / 16 });
     this.context2D = this.createCanvas().getContext("2d")!;
-    this.context2D.font = "16px Comic sans";
-    this.context2D.fillStyle = "yellow";
-
-    webglUtils.resizeCanvasToDisplaySize(this.gl.canvas);
-    webglUtils.resizeCanvasToDisplaySize(this.context2D.canvas);
+      this.resizeCanvasHtml(this.context2D.canvas, this.size);
+      this.context2D.font = "16px Comic sans";
+      this.context2D.fillStyle = "yellow";
   }
 
   drawContext(game: Game, dt: number): void {
     //if (!environment.draw3d) return;
     this.reset();
-
-    // this.setColor(0.5, 1, 1);
-    // this.drawRectangle(10, 10, 40, 150);
-    // this.finishDrawing();
-    // return;
 
     this.drawFps(dt);
 

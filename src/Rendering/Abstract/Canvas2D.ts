@@ -4,8 +4,8 @@ import { Vector2 } from "@/Engine/Vector2";
 export abstract class Canvas2D extends Canvas {
   protected contextd2D: CanvasRenderingContext2D;
 
-  protected constructor(size: Vector2) {
-    super(size);
+  protected constructor(size: Vector2, canvas ?: HTMLCanvasElement) {
+    super(size, canvas);
     const context = this.canvas.getContext("2d") as CanvasRenderingContext2D;
     context.lineCap = "round";
     context.lineJoin = "round";

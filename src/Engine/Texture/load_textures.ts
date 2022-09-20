@@ -15,7 +15,7 @@ function getAllTexture() {
 
   textures_path.forEach((path) => {
     const image = new Image();
-    image.src = `assets/${path}`;
+    image.src = `assets/textures/${path}`;
 
     promises.push(
       new Promise((resolve) => {
