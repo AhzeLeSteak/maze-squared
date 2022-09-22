@@ -70,22 +70,6 @@ export class CanvasTopView extends Canvas2D {
         player_pos.x *= this.tile_size;
         player_pos.y *= this.tile_size;
 
-        /*
-        const trunced_pos = {
-            x: Math.floor(player_pos.x),
-            y: Math.floor(player_pos.y),
-        };
-
-        if (
-            trunced_pos.x !== this.last_player_pos.x &&
-            trunced_pos.y !== this.last_player_pos.y &&
-            game.map.box(trunced_pos.x, trunced_pos.y) > 1
-        ) {
-            this.last_player_pos = trunced_pos;
-            console.warn("Player standing on teleporter ", player_pos);
-        }
-
-
         const x = Math.floor(game.player.pos.x) * this.tile_size;
         const y = Math.floor(game.player.pos.y) * this.tile_size;
 
@@ -94,7 +78,7 @@ export class CanvasTopView extends Canvas2D {
 
         // affichage des rayons
 
-        */
+
         // affichage du joueur
         this.contextd2D.strokeStyle = "red";
         this.contextd2D.fillStyle = "red";
