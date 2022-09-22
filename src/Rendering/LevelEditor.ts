@@ -1,7 +1,9 @@
 import { Game } from "@/Engine/Game";
 import { Vector2 } from "@/Engine/Vector2";
+import { Tile } from "@/Engine/Tiles/Tile";
 
 export class LevelEditor {
+
   constructor(
     canvas: HTMLCanvasElement,
     private readonly tile_size: number,
@@ -12,15 +14,15 @@ export class LevelEditor {
     const set_box = (ev: MouseEvent) => {
       const v = this.getPos(ev);
       ev.preventDefault();
-      this.game.map.setBox(v, ev.button === 0 ? 1 : 0);
+      this.game.map.setTile(v, ev.button === 0 ? new Tile(1) : new Tile(0));
     };
 
     const set_player_pos = (ev: MouseEvent) => {
       const v = this.getPos(ev);
-      if (game.map.box(v.x, v.y) === 0) {
+      if (!game.map.tile(v.x, v.y).solid) {
         game.player.pos = { ...v };
-        game.player.pos.x += 0.5;
-        game.player.pos.y += 0.5;
+        //game.player.pos.x += 0.5;
+        //game.player.pos.y += 0.5;
         game.map.map_info.playerPos = v;
       }
     };
@@ -36,7 +38,11 @@ export class LevelEditor {
   private getPos(ev: MouseEvent): Vector2 {
     return {
       x: Math.floor(ev.offsetX / this.tile_size),
-      y: Math.floor(ev.offsetY / this.tile_size),
+      y: Math.floor(ev.offsetY / this.tile_size)
     };
+  }
+
+  reset_map() {
+    this.game.map.load();
   }
 }

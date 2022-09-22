@@ -1,14 +1,20 @@
-import { distance, infinite, Vector2 } from "./Vector2";
-import { pi, pi_over_2, two_pi } from "./utils";
+import { Vector2 } from "./Vector2";
+import { Tile, WALL } from "@/Engine/Tiles/Tile";
+
+export enum BoxType {
+  FLOOR,
+  WALL,
+  TP
+}
 
 export class GameMap {
   // <editor-fold desc="Attributes and constructor">
   map_info: {
-    boxes: Array<number>;
+    boxes: Array<Tile>;
     playerPos: Vector2;
   } = {
     boxes: [],
-    playerPos: { x: 5, y: 5 },
+    playerPos: { x: 5, y: 5 }
   };
 
   size: Vector2 = {
@@ -24,28 +30,37 @@ export class GameMap {
 
   // <editor-fold desc="Box gestion">
 
-  get boxes(): Array<number> {
+  get boxes(): Array<Tile> {
     return this.map_info.boxes;
   }
 
   public load(): void {
-    this.map_info.boxes = [
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 0, 0, 0, 0, 1, 3, 1, 1, 0, 1, 0, 0,
-      0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1,
-      1, 2, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0,
-      0, 0, 0, 0, 1, 1, 1, 1, 3, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    ];
+    this.map_info.boxes = new Array(this.size.x * this.size.y)
+      .fill(0)
+      .map((_, i) =>
+        i < this.size.x
+        || i > this.size.x * (this.size.y - 1)
+        || i % this.size.x === 0
+        || (i + 1) % this.size.x === 0
+          ? new Tile(1) : new Tile(0));
   }
 
-  to_index(v: Vector2): number {
+  vector_to_map_index(v: Vector2): number {
     return Math.floor(v.x) + Math.floor(v.y) * this.size.x;
   }
 
-  box(x: number, y: number, can_oob = false): number {
+  map_index_to_vector(i: number): Vector2 {
+    return {
+      x: i % this.size.x,
+      y: Math.floor(i / this.size.x)
+    };
+  }
+
+  tile(x: number, y: number, can_oob = false): Tile {
     x = Math.floor(x);
     y = Math.floor(y);
     if (this.isOutOfBound({ x, y })) {
-      if (can_oob) return 1;
+      if (can_oob) return WALL;
       throw new Error(`Out of bound : {x:${x}, y:${y}}`);
     }
     return this.boxes[x + y * this.size.x];
@@ -55,337 +70,103 @@ export class GameMap {
     return x < 0 || y < 0 || x >= this.size.x || y >= this.size.y;
   }
 
-  setBox(v: Vector2, box_type: number): void {
-    const index = this.to_index(v);
-    if (Math.floor(this.boxes[index]) !== box_type || box_type < 2) {
-      this.boxes[index] = box_type;
-    } else {
-      this.boxes[index] += 0.25;
-      if (this.boxes[index] - box_type === 1) {
-        this.boxes[index]--;
-      }
-    }
+  setTile(v: Vector2, tile: Tile): void {
+    const index = this.vector_to_map_index(v);
+    this.boxes[index] = tile;
   }
 
   // </editor-fold>
 
   // <editor-fold desc="Map exploration">
-  getNextPoint(
-    { x, y }: Vector2,
-    angle: number
-  ): {
-    point: Vector2;
-    distance: number;
-    wallCol: number;
-    from: "HORIZONTAL" | "VERTICAL";
-    pointsToDraw: Array<Vector2>;
-    pointBreak: Array<number>;
-    squaresToDraw: Array<Vector2>;
-  } {
-    const in_range_angle = (a: number) => (a + two_pi) % two_pi;
-    angle = in_range_angle(angle);
-    const pointsToDraw: Array<Vector2> = [];
-    const squaresToDraw: Array<Vector2> = [];
-    const pointBreak: Array<number> = [];
-
-    let from: "HORIZONTAL" | "VERTICAL" = "HORIZONTAL";
-    const directionV = () => (angle > Math.PI ? "UP" : "DOWN");
-    const directionH = () =>
-      angle > pi_over_2 && angle < 3 * pi_over_2 ? "LEFT" : "RIGHT";
-
-    let old_x = x;
-    let old_y = y;
-    let nx = x;
-    let ny = y;
-
-    const get_box_type = () => {
-      let dx = 0;
-      let dy = 0;
-      if (nx % 1 === 0 && directionH() === "LEFT") {
-        dx = -1;
-      }
-      if (ny % 1 === 0 && "HORIZONTAL" && directionV() === "UP") {
-        dy = -1;
-      }
-
-      squaresToDraw.push({ x: Math.floor(nx) + dx, y: Math.floor(ny) + dy });
-      return this.box(Math.floor(nx) + dx, Math.floor(ny) + dy, true);
-    };
-
-    let dist = 0;
-    let i = 0;
-
-    try {
-      do {
-        if (i++ > 100) {
-          return {
-            point: infinite,
-            distance: Infinity,
-            wallCol: 0,
-            from,
-            pointsToDraw: [],
-            pointBreak,
-            squaresToDraw: [],
-          };
-        }
-
-        const diff_x_left_side =
-          (nx % 1) + (nx % 1 === 0 && directionH() === "LEFT" ? 1 : 0);
-        const diff_x_right_side = 1 - diff_x_left_side;
-        const diff_y_up_side =
-          (ny % 1) + (ny % 1 === 0 && directionV() === "UP" ? 1 : 0);
-        const diff_y_down_side = 1 - diff_y_up_side;
-
-        const angle1 = in_range_angle(
-          Math.atan2(diff_y_down_side, diff_x_right_side)
-        ); // DOWN RIGHT CORNER
-        const angle2 = in_range_angle(
-          Math.atan2(diff_y_down_side, -diff_x_left_side)
-        ); // DOWN LEFT CORNER
-        const angle3 = in_range_angle(
-          Math.atan2(-diff_y_up_side, -diff_x_left_side)
-        ); // UP LEFT CORNER
-        const angle4 = in_range_angle(
-          Math.atan2(-diff_y_up_side, diff_x_right_side)
-        ); // UP RIGHT CORNER
-
-        let direction: "RIGHT" | "DOWN" | "LEFT" | "UP";
-
-        const tmp_x = nx;
-        const tmp_y = ny;
-        if (angle < angle1) {
-          // RIGHT
-          nx = nx - (nx % 1) + 1;
-          ny = (nx - old_x) * Math.tan(angle) + old_y;
-          from = "VERTICAL";
-          direction = "RIGHT";
-        } else if (angle < angle2) {
-          // DOWN
-          ny = ny - (ny % 1) + 1;
-          nx = (old_y - ny) * Math.tan(angle - pi_over_2) + old_x;
-          from = "HORIZONTAL";
-          direction = "DOWN";
-        } else if (angle < angle3) {
-          // GAUCHE
-          if (nx % 1 === 0) {
-            nx -= 1;
-          } else {
-            nx = nx - (nx % 1);
-          }
-          ny = (nx - old_x) * Math.tan(angle - pi) + old_y;
-          from = "VERTICAL";
-          direction = "LEFT";
-        } else if (angle < angle4) {
-          // HAUT
-          if (ny % 1 === 0) {
-            ny -= 1;
-          } else {
-            ny = ny - (ny % 1);
-          }
-          nx = (old_y - ny) * Math.tan(angle - pi_over_2) + old_x;
-          from = "HORIZONTAL";
-          direction = "UP";
-        } else {
-          // RIGHT AGAIN
-          nx = nx - (nx % 1) + 1;
-          ny = (nx - old_x) * Math.tan(angle) + old_y;
-          from = "VERTICAL";
-          direction = "RIGHT";
-        }
-        old_x = tmp_x;
-        old_y = tmp_y;
-
-        dist += distance({ x: old_x, y: old_y }, { x: nx, y: ny });
-        pointsToDraw.push({ x: nx, y: ny });
-
-        const box_type = get_box_type();
-        if (box_type > 1) {
-          const { v, angle: n_angle } = this.getThrough(
-            { x: nx, y: ny },
-            angle,
-            direction
-          );
-          nx = v.x;
-          ny = v.y;
-          old_x = nx;
-          old_y = ny;
-          angle = n_angle;
-          pointBreak.push(pointsToDraw.length);
-          pointsToDraw.push({ x: nx, y: ny });
-        }
-      } while (get_box_type() !== 1);
-    } catch (e) {
-      console.error(e);
-    }
-    const wallCol = (from === "HORIZONTAL" ? nx : ny) % 1;
-
-    return {
-      point: {
-        x: nx,
-        y: ny,
-      },
-      distance: dist,
-      wallCol,
-      from,
-      pointsToDraw,
-      pointBreak,
-      squaresToDraw,
-    };
+  getCoordsOfTile(tile: Tile) {
+    return this.map_index_to_vector(this.boxes.findIndex(t => t === tile));
   }
 
-  public getThrough(
-    v: Vector2,
-    angle: number,
-    direction: "RIGHT" | "DOWN" | "LEFT" | "UP",
-    isPlayer = false
-  ): {
-    v: Vector2;
-    angle: number;
-  } {
-    const nv = this.getOtherBox(
-      v.x - (v.x % 1 === 0 && direction === "LEFT" ? 1 : 0),
-      v.y - (v.y % 1 === 0 && direction === "UP" ? 1 : 0)
-    );
+  getNextWall(v: Vector2, angle: number): { v: Vector2, distance: number, wallCol: number, orientation: "vertical" | "horizontal"; } {
+    let t: Tile;
+    let dist = 0;
+    let orientation: "vertical" | "horizontal";
+    do {
+      const next_point = this.getNextPoint(v, angle);
+      t = this.getTileFromSideCoords(next_point.v, angle);
+      dist += next_point.dist;
+      v = next_point.v;
+      orientation = next_point.orientation;
+    } while (t.solid === 0);
 
-    const rotation =
-      (this.box(
-        v.x - (v.x % 1 === 0 && direction === "LEFT" ? 1 : 0),
-        v.y - (v.y % 1 === 0 && direction === "UP" ? 1 : 0)
-      ) %
-        1) /
-      0.25;
+    const wallCol = (orientation === "horizontal" ? v.x : v.y) % 1;
 
-    const diff: Vector2 = {
-      x: v.x % 1,
-      y: v.y % 1,
-    };
 
-    if (rotation == 2) {
-      if (direction == "UP" || direction == "DOWN") {
-        diff.x = 1 - diff.x;
-        diff.y = direction === "UP" ? 1 - diff.y : diff.y * -1;
-        if (isPlayer && direction === "UP") {
-          nv.y++;
-        }
-      } else {
-        diff.y = 1 - diff.y;
-        diff.x = direction === "LEFT" ? 1 - diff.x : diff.x * -1;
-        if (isPlayer && direction === "LEFT") {
-          nv.x++;
-        }
-      }
+    return { v, distance: dist, orientation, wallCol };
+  }
 
-      return {
-        v: {
-          x: nv.x + diff.x,
-          y: nv.y + diff.y,
-        },
-        angle: (angle + pi) % two_pi,
-      };
-    }
+  getNextPoint({ x, y }: Vector2, angle: number): { v: Vector2, dist: number, orientation: "vertical" | "horizontal" } {
+    const x_is_int = x === Math.floor(x);
+    const y_is_int = y === Math.floor(y);
 
-    const dirs: Array<"UP" | "RIGHT" | "LEFT" | "DOWN"> = [
-      "UP",
-      "RIGHT",
-      "DOWN",
-      "LEFT",
-    ];
+    if (angle === 0)
+      return { v: { x: x_is_int ? x + 1 : Math.ceil(x), y }, dist: 1, orientation: "horizontal" };
+    if (angle === Math.PI)
+      return { v: { x: x_is_int ? x - 1 : Math.floor(x), y }, dist: 1, orientation: "horizontal" };
+    if (angle === Math.PI * 3 / 2)
+      return { v: { x, y: y_is_int ? y - 1 : Math.floor(y) }, dist: 1, orientation: "vertical" };
+    if (angle === Math.PI / 2)
+      return { v: { x, y: y_is_int ? y + 1 : Math.ceil(y) }, dist: 1, orientation: "vertical" };
 
-    for (let i = 0; i < rotation; i++) {
-      //rotate
-      const x = diff.x;
-      diff.x = 1 - diff.y;
-      diff.y = x;
-      direction = dirs[(dirs.indexOf(direction) + 1) % 4];
-      angle = (angle + pi_over_2) % two_pi;
-    }
+    const face_left = angle >= Math.PI / 2 && angle <= Math.PI * 3 / 2;
+    const face_down = angle <= Math.PI;
 
-    // #### corrections
+    let normalized_x = face_left ? x % 1 : 1 - (x % 1);
+    let normalized_y = !face_down ? y % 1 : 1 - (y % 1);
+    normalized_x = normalized_x === 0 ? 1 : normalized_x;
+    normalized_y = normalized_y === 0 ? 1 : normalized_y;
 
-    switch (rotation === 0 && direction) {
-      case "DOWN":
-        nv.y++;
-        break;
-      case "RIGHT":
-        nv.x++;
-        break;
-    }
-    switch (rotation === 0 && isPlayer && direction) {
-      case "UP":
-        nv.y--;
-        break;
-      case "LEFT":
-        nv.x--;
-        break;
-    }
 
-    switch (rotation == 1 && isPlayer && direction) {
-      case "DOWN":
-        nv.y++;
-        break;
-      case "RIGHT":
-        nv.x++;
-        break;
-      case "UP":
-        nv.y--;
-        break;
-      case "LEFT":
-        nv.x--;
-        break;
-    }
+    let next_y = normalized_x * Math.tan(face_left ? Math.PI - angle : angle);
+    let next_x = normalized_y / Math.tan(face_down ? angle : Math.PI - angle);
 
-    switch (rotation == 1 && !isPlayer && direction) {
-      case "LEFT":
-        nv.x--;
-        break;
-      case "DOWN":
-        nv.y++;
-        break;
-    }
+    const hypo_x = next_x / Math.cos(angle);
+    const hypo_y = next_y / Math.sin(angle);
+    let dist: number;
+    let orientation: "vertical" | "horizontal";
 
-    switch (rotation === 3 && direction) {
-      case "UP":
-        nv.y--;
-        break;
-      case "RIGHT":
-        nv.x++;
-    }
-
-    switch (rotation === 3 && isPlayer && direction) {
-      case "LEFT":
-        nv.x--;
-        break;
-      case "DOWN":
-        nv.y++;
-        break;
+    if (hypo_y < hypo_x) {
+      next_x = Math.round(x + normalized_x * (face_left ? -1 : 1));
+      next_y += y;
+      dist = hypo_y;
+      orientation = "vertical";
+    } else {
+      next_y = Math.round(y + normalized_y * (!face_down ? -1 : 1));
+      next_x += x;
+      dist = hypo_x;
+      orientation = "horizontal";
     }
 
     return {
       v: {
-        x: nv.x + diff.x,
-        y: nv.y + diff.y,
+        x: next_x,
+        y: next_y
       },
-      angle,
+      dist,
+      orientation
     };
+    //this.getNextPoint({x: next_x, y: next_y}, angle, dist-1);
   }
 
-  public getOtherBox(x: number, y: number): Vector2 {
-    x = Math.floor(x);
-    y = Math.floor(y);
-    const box_type = Math.floor(this.box(x, y));
-    if (box_type <= 1) {
-      throw new Error(box_type + " can not be a teleporter");
+  getTileFromSideCoords({ x, y }: Vector2, angle: number): Tile {
+    const x_is_int = x === Math.floor(x);
+    const y_is_int = y === Math.floor(y);
+
+    if (x_is_int) {
+      const face_left = angle >= Math.PI / 2 && angle <= Math.PI * 3 / 2;
+      return this.tile(x + (face_left ? -1 : 0), Math.floor(y));
+    } else if (y_is_int) {
+      const face_down = angle <= Math.PI;
+      return this.tile(Math.floor(x), y + (face_down ? 0 : -1));
     }
-    for (let i = 0; i < this.boxes.length; i++) {
-      if (Math.floor(this.boxes[i]) === box_type && i !== x + y * this.size.x) {
-        return {
-          x: i % this.size.x,
-          y: Math.floor(i / this.size.x),
-        };
-      }
-    }
-    throw new Error(`Can't find other box of type ${box_type}`);
+    throw new Error("Get Tile from Side coords");
   }
+
 
   // </editor-fold>
 }

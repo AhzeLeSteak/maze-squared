@@ -6,14 +6,13 @@ export class Player {
   /**
    * Angle en radian
    */
-  public angle = -pi_over_2;
+  public angle = pi_over_2;
   public readonly speed = 2; //tile per second
   public readonly rotation_speed = 120; // deg per second
   private box_type = 0;
 
   constructor(public pos: Vector2) {
-    this.pos.x += 0.5;
-    this.pos.y += 0.5;
+
   }
 
   addAngle(da: number): void {
@@ -24,12 +23,12 @@ export class Player {
   walk(map: GameMap, dt: number, angle = this.angle): void {
     const nextPoint = this.getNextPointWalking(dt, angle);
     const old_pos: Vector2 = { ...this.pos };
-    if (map.box(nextPoint.x, nextPoint.y, true) !== 1) {
+    if (!map.tile(nextPoint.x, nextPoint.y, true).solid) {
       this.pos.x = nextPoint.x;
       this.pos.y = nextPoint.y;
-    } else if (map.box(this.pos.x, nextPoint.y, true) !== 1) {
+    } else if (!map.tile(this.pos.x, nextPoint.y, true).solid) {
       this.pos.y = nextPoint.y;
-    } else if (map.box(nextPoint.x, this.pos.y, true) !== 1) {
+    } else if (!map.tile(nextPoint.x, this.pos.y, true).solid) {
       this.pos.x = nextPoint.x;
     }
 
@@ -47,19 +46,6 @@ export class Player {
         ? "DOWN"
         : "UP";
 
-    const new_type = Math.floor(map.box(this.pos.x, this.pos.y));
-    if (new_type > 1 && this.box_type !== new_type) {
-      const { v, angle: n_angle } = map.getThrough(
-        { x: this.pos.x, y: this.pos.y },
-        this.angle,
-        direction,
-        true
-      );
-      this.pos.x = v.x;
-      this.pos.y = v.y;
-      this.angle = n_angle;
-    }
-    this.box_type = new_type;
   }
 
   getNextPointWalking(

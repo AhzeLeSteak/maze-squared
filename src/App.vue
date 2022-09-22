@@ -2,7 +2,7 @@
 
   <div class="background"></div>
   <a href="https://github.com/AhzeLeSteak/maze-squared" title="Github repo">
-    <img src="/assets/ui/logo.png" id="main-logo" alt="main_logo">
+    <img id="main-logo" alt="main_logo" src="assets/ui/logo.png">
   </a>
 
 
@@ -16,7 +16,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { Game } from "@/Engine/Game";
-import {router} from "@/router/router";
+import { router } from "@/router/router";
 
 export default defineComponent({
   name: "App",

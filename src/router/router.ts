@@ -1,4 +1,4 @@
-import {createRouter, createWebHistory, RouteRecordRaw} from "vue-router";
+import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
 
 const routes: RouteRecordRaw[] = [
     {
@@ -12,12 +12,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('../views/Edit.vue')
     },
     {
-        path: '/*',
-        redirect: '/play'
+        path: "/:catchAll(.*)",
+        redirect: "/play"
     }
 ]
 
 export const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHashHistory(),
     routes
 })

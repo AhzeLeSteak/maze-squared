@@ -17,9 +17,9 @@ export class CanvasRaycast extends CanvasWebGL {
   constructor(width: number, height?: number) {
     super({ x: width, y: height || (width * 9) / 16 });
     this.context2D = this.createCanvas().getContext("2d")!;
-      this.resizeCanvasHtml(this.context2D.canvas, this.size);
-      this.context2D.font = "16px Comic sans";
-      this.context2D.fillStyle = "yellow";
+    this.resizeCanvasHtml(this.context2D.canvas, this.size);
+    this.context2D.font = "16px Comic sans";
+    this.context2D.fillStyle = "yellow";
   }
 
   drawContext(game: Game, dt: number): void {
@@ -41,9 +41,10 @@ export class CanvasRaycast extends CanvasWebGL {
         (((base_x - this.size.x / 2) * game.view_angle) / this.size.x) *
         degreToRadian;
       const ray_angle = game.player.angle + ray_diff_angle; // get the angle of the actual ray
-      const nextWall = map.getNextPoint(player_pos, ray_angle); // calculate where the ray goes
+      const nextWall = map.getNextWall(player_pos, ray_angle); // calculate where the ray goes
 
-      const t = textures.get(nextWall.from === "VERTICAL" ? "wall" : "wall_2")!;
+      const t = textures.get("wall")!;
+      //const t = textures.get(nextWall.from === "VERTICAL" ? "wall" : "wall_2")!;
       const tile_size = t.columns.length;
       const dist = nextWall.distance * tile_size * Math.cos(ray_diff_angle); // diff_angle to fix fish eye effect
 
@@ -97,10 +98,7 @@ export class CanvasRaycast extends CanvasWebGL {
         tx = Math.floor(tx * floor_tile_size);
         ty = Math.floor(ty * floor_tile_size);
 
-        const nColor =
-          floor_texture.columns[tx & (floor_tile_size - 1)][
-            ty & (floor_tile_size - 1)
-          ];
+        const nColor = floor_texture.columns[tx & (floor_tile_size - 1)][ty & (floor_tile_size - 1)];
         if (nColor !== color || y === this.size.y) {
           this.setColor(color.r / 255, color.g / 255, color.b / 255);
           color = nColor;

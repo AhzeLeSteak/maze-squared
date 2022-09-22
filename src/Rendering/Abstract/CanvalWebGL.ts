@@ -15,6 +15,7 @@ export abstract class CanvasWebGL extends Canvas {
     super(size);
     this.gl = this.canvas.getContext("webgl2")!;
     this.setupWebGl();
+    this.reset();
   }
 
   private setupWebGl() {
@@ -59,9 +60,6 @@ export abstract class CanvasWebGL extends Canvas {
     gl.attachShader(program, fShader);
     gl.linkProgram(program);
     gl.useProgram(program);
-
-    gl.clearColor(1, 0, 0, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
   }
 
   private deviceToNormalised(point: number, horizontal: boolean) {

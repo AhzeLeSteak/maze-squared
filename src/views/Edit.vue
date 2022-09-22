@@ -12,41 +12,51 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, PropType} from "vue";
-import {Game} from "@/Engine/Game";
-import {CanvasTopView} from "@/Rendering/CanvasTopView";
+import { defineComponent, PropType } from "vue";
+import { Game } from "@/Engine/Game";
+import { CanvasTopView } from "@/Rendering/CanvasTopView";
+import { LevelEditor } from "@/Rendering/LevelEditor";
 
 
-const bg = (txt_name: string) => `background-image: url("/assets/ui/toolbox/${txt_name}.png")`
+const bg = (txt_name: string) => `background-image: url("assets/ui/toolbox/${txt_name}.png")`;
 
 export default defineComponent({
-  name: 'Edit',
+  name: "Edit",
   props: {
     game: {
       type: Object as PropType<Game>,
       required: true
     }
   },
-  data(){
+  data() {
     return {
-      buttons: [
-        {
-          style: bg('wall_floor'),
-          onclick: () => {
-            console.log('a');
-          }
-        }
-      ]
-    }
+      buttons: [] as { onclick: () => void, style?: string }[]
+    };
   },
   mounted() {
-    const renderer = new CanvasTopView(this.game, 64, document.getElementById("top-view") as HTMLCanvasElement);
-    this.game.loop([renderer]);
+    const tile_size = 64;
+    const canvas = document.getElementById("top-view") as HTMLCanvasElement;
+    const level_editor = new LevelEditor(canvas, tile_size, this.game);
+    this.game.loop([new CanvasTopView(this.game, tile_size, canvas)]);
+    this.buttons = [
+      {
+        style: bg("wall_floor"),
+        onclick: () => {
+          console.log("a");
+        }
+      },
+      {
+        onclick: () => {
+          level_editor.reset_map();
+        }
+      }
+    ];
+
   },
   unmounted() {
     this.game.stop();
   }
-})
+});
 </script>
 
 <style>
