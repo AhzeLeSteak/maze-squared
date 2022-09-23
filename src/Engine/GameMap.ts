@@ -1,21 +1,18 @@
 import { Vector2 } from "./Vector2";
 import { Tile, WALL } from "@/Engine/Tiles/Tile";
-import {correct_angle, two_pi} from "@/Engine/utils";
+import { correct_angle, two_pi } from "@/Engine/utils";
 
 
 export class GameMap {
     // <editor-fold desc="Attributes and constructor">
-    map_info: {
-        boxes: Array<Tile>;
-        playerPos: Vector2;
-    } = {
-        boxes: [],
-        playerPos: { x: 5, y: 5 }
+    map_info = {
+        boxes: [] as Array<Tile>,
+        player_pos: { x: 5, y: 5 } as Vector2
     };
 
     size: Vector2 = {
         x: 10,
-        y: 10,
+        y: 10
     };
 
     constructor() {

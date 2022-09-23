@@ -2,6 +2,7 @@ import { Game } from "@/Engine/Game";
 import { Vector2 } from "@/Engine/Vector2";
 import { degreToRadian } from "@/Engine/utils";
 import { Canvas2D } from "./Abstract/Canvas2D";
+import { Teleporter } from "@/Engine/Tiles/Teleporter";
 
 export class CanvasTopView extends Canvas2D {
     private last_player_pos: Vector2;
@@ -26,13 +27,25 @@ export class CanvasTopView extends Canvas2D {
         for (let y = 0; y < map.size.y; y++) {
             for (let x = 0; x < map.size.x; x++) {
                 const tile = map.tile(x, y);
-                this.contextd2D.fillStyle = ["grey", "black"][tile.solid] ?? "yellow";
-                this.drawSquare(
-                  x * this.tile_size + 1,
-                  y * this.tile_size + 1,
-                  this.tile_size - 2,
-                  this.tile_size - 2
-                );
+                if (tile.tile_type === "base") {
+                    this.contextd2D.fillStyle = ["grey", "black"][tile.solid] ?? "yellow";
+                    this.drawSquare(
+                      x * this.tile_size + 1,
+                      y * this.tile_size + 1,
+                      this.tile_size - 2,
+                      this.tile_size - 2
+                    );
+                } else if (tile.tile_type === "teleporter") {
+                    const tp = tile as Teleporter;
+                    const img = document.getElementById(tp.teleporter_type) as CanvasImageSource;
+                    if (img)
+                        this.contextd2D.drawImage(img,
+                          0, 0, 16, 16,
+                          x * this.tile_size + 1,
+                          y * this.tile_size + 1,
+                          this.tile_size - 2,
+                          this.tile_size - 2);
+                }
             }
         }
 

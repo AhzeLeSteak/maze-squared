@@ -17,7 +17,7 @@ export class Game {
     console.log("Instanciating Game class");
     this.controller = new Controller(this);
     this.map = new GameMap();
-    this.player = new Player(this.map.map_info.playerPos);
+    this.player = new Player(this.map.map_info.player_pos);
   }
 
   init() {

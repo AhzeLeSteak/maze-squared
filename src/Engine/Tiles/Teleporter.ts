@@ -1,8 +1,10 @@
 import { Tile } from "@/Engine/Tiles/Tile";
 
+export type TeleporterType = "heart" | "diamonds" | "clubs" | "spades";
+
 export class Teleporter extends Tile {
 
-  constructor(public rotation = 0) {
+  constructor(public readonly teleporter_type: TeleporterType, public rotation = 0) {
     super(1);
     this.tile_type = "teleporter";
   }
