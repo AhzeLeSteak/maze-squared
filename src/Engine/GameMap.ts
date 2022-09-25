@@ -5,10 +5,9 @@ import {Teleporter} from "@/Engine/Tiles/Teleporter";
 
 export enum Direction{
     UP,
+    RIGHT,
     DOWN,
     LEFT,
-    RIGHT,
-    NONE
 }
 export class GameMap {
     // <editor-fold desc="Attributes and constructor">
@@ -145,7 +144,7 @@ export class GameMap {
         }
         else if(initial)
             return this.tile(x, y, true, false);
-        throw new Error("Get Tile from Side coords");
+        throw new Error(`Get Tile from Side coords {x:${x}, y:${y}}`);
     }
 
 

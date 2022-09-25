@@ -13,11 +13,29 @@ export enum TeleporterType {
 
 export const TP_TYPE_NAMES = ['hearts', 'diamonds', 'clubs', 'spades'];
 
+function rotate_point(rotation_center: Vector2, angle: number, p: Vector2): Vector2{
+    let s = Math.sin(angle);
+    let c = Math.cos(angle);
+
+    // translate point back to origin:
+    p.x -= rotation_center.x;
+    p.y -= rotation_center.y;
+
+    // rotate point
+    let xnew = p.x * c - p.y * s;
+    let ynew = p.x * s + p.y * c;
+
+    // translate point back:
+    p.x = xnew + rotation_center.x;
+    p.y = ynew + rotation_center.y;
+    return p;
+}
+
 export class Teleporter extends Tile {
 
     public twin !: Teleporter;
 
-    constructor(public readonly teleporter_type: TeleporterType, public rotation = 0) {
+    constructor(public readonly teleporter_type: TeleporterType, public rotation = false) {
         super(0);
         this.tile_type = "teleporter";
     }

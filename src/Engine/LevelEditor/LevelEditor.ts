@@ -7,6 +7,7 @@ import {PlayerPosTool} from "@/Engine/LevelEditor/PlayerPosTool";
 import {TeleporterTool} from "@/Engine/LevelEditor/TeleporterTool";
 import {TeleporterType} from "@/Engine/Tiles/Teleporter";
 import {CanvasTopView} from "@/Rendering/CanvasTopView";
+import {RotateTool} from "@/Engine/LevelEditor/RotateTool";
 
 export class LevelEditor {
 
@@ -24,6 +25,7 @@ export class LevelEditor {
             new TeleporterTool(TeleporterType.diamonds, canvas),
             new TeleporterTool(TeleporterType.clubs, canvas),
             new TeleporterTool(TeleporterType.spades, canvas),
+            new RotateTool(),
             new PlayerPosTool(),
             new ResetTool()
         ];

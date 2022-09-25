@@ -41,13 +41,20 @@ export class CanvasTopView extends Canvas2D {
                 } else if (tile.tile_type === "teleporter") {
                     const tp = tile as Teleporter;
                     const img = document.getElementById(TP_TYPE_NAMES[tp.teleporter_type]) as CanvasImageSource;
-                    if (img)
-                        this.contextd2D.drawImage(img,
-                            0, 0, 16, 16,
-                            x * tile_size + 1,
-                            y * tile_size + 1,
-                            tile_size - 2,
-                            tile_size - 2);
+                    if (!img) continue;
+                    this.contextd2D.drawImage(img,
+                        0, 0, 16, 16,
+                        x * tile_size + 1,
+                        y * tile_size + 1,
+                        tile_size - 2,
+                        tile_size - 2);
+                    this.contextd2D.fillStyle = 'rgba(208,17,17,0.42)'
+                    if(tp.rotation)
+                    this.drawSquare(
+                        x * tile_size + 1,
+                        y * tile_size + 1,
+                        tile_size - 2,
+                        tile_size - 2)
                 }
             }
         }
