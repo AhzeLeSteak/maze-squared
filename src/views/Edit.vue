@@ -9,9 +9,17 @@
       ></button>
     </div>
 
-    <canvas id="top-view" @click="level_editor.click($event)" @contextmenu="level_editor.context_menu($event)"></canvas>
+    <canvas id="top-view"
+            @click="level_editor.click($event)"
+            @mousedown="level_editor.dragging = $event.button"
+            @mouseup="level_editor.dragging = -1"
+            @contextmenu="level_editor.context_menu($event)"
+            @mousemove="level_editor.mouse_move($event)"
+    ></canvas>
+
+
     <div style="display: none">
-      <img id="heart" src="/assets/ui/toolbox/tp_heart.png">
+      <img id="hearts" src="/assets/ui/toolbox/tp_hearts.png">
       <img id="clubs" src="/assets/ui/toolbox/tp_clubs.png">
       <img id="diamonds" src="/assets/ui/toolbox/tp_diamonds.png">
       <img id="spades" src="/assets/ui/toolbox/tp_spades.png">
@@ -22,10 +30,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { Game } from "@/Engine/Game";
-import { CanvasTopView } from "@/Rendering/CanvasTopView";
-import { LevelEditor } from "@/Engine/LevelEditor/LevelEditor";
+import {defineComponent, PropType} from "vue";
+import {Game} from "@/Engine/Game";
+import {CanvasTopView} from "@/Rendering/CanvasTopView";
+import {LevelEditor} from "@/Engine/LevelEditor/LevelEditor";
 
 
 export default defineComponent({
@@ -44,8 +52,9 @@ export default defineComponent({
   mounted() {
     const tile_size = 64;
     const canvas = document.getElementById("top-view") as HTMLCanvasElement;
-    this.level_editor = new LevelEditor(canvas, tile_size, this.game);
-    this.game.loop([new CanvasTopView(this.game, tile_size, canvas)]);
+    const renderer =new CanvasTopView(this.game, tile_size, canvas);
+    this.level_editor = new LevelEditor(this.game, renderer);
+    this.game.start_loop(renderer);
 
   },
   unmounted() {

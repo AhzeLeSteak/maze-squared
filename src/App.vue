@@ -14,9 +14,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { Game } from "@/Engine/Game";
-import { router } from "@/router/router";
+import {defineComponent} from "vue";
+import {Game} from "@/Engine/Game";
+import {router} from "@/router/router";
 
 export default defineComponent({
   name: "App",
@@ -28,7 +28,7 @@ export default defineComponent({
   },
   mounted() {
     this.game.init().then(() => this.inited = true);
-    document.addEventListener('keypress', e => {
+    document.addEventListener('keydown', e => {
       if(e.code === 'KeyP'){
         router.push(this.$route.name === 'play' ? '/edit' : 'play');
       }

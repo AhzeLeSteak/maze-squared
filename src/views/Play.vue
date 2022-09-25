@@ -18,8 +18,7 @@ export default defineComponent({
     }
   },
   mounted() {
-    const renderer = new CanvasRaycast(window.innerWidth*.8, window.innerHeight*.8);
-    this.game.loop([renderer]);
+    this.game.start_loop(new CanvasRaycast(window.innerWidth*.8, window.innerHeight*.8));
   },
   unmounted() {
     this.game.stop();

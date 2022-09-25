@@ -1,6 +1,6 @@
-import { Vector2 } from "@/Engine/Vector2";
-import { pi_over_2, two_pi } from "@/Engine/utils";
-import { GameMap } from "@/Engine/GameMap";
+import {Vector2} from "@/Engine/Vector2";
+import {correct_angle, pi_over_2} from "@/Engine/utils";
+import {Direction, GameMap} from "@/Engine/GameMap";
 
 export class Player {
   /**
@@ -9,7 +9,6 @@ export class Player {
   public angle = pi_over_2;
   public readonly speed = 2; //tile per second
   public readonly rotation_speed = 120; // deg per second
-  private box_type = 0;
 
   constructor(public pos: Vector2) {
 
@@ -17,7 +16,7 @@ export class Player {
 
   addAngle(da: number): void {
     this.angle += da;
-    this.angle = (this.angle + two_pi) % two_pi;
+    this.angle = correct_angle(this.angle);
   }
 
   walk(map: GameMap, dt: number, angle = this.angle): void {
@@ -26,10 +25,6 @@ export class Player {
     if (!map.tile(nextPoint.x, nextPoint.y, true).solid) {
       this.pos.x = nextPoint.x;
       this.pos.y = nextPoint.y;
-    } else if (!map.tile(this.pos.x, nextPoint.y, true).solid) {
-      this.pos.y = nextPoint.y;
-    } else if (!map.tile(nextPoint.x, this.pos.y, true).solid) {
-      this.pos.x = nextPoint.x;
     }
 
     const diff_pos: Vector2 = {
@@ -39,12 +34,15 @@ export class Player {
 
     const direction =
       diff_pos.x === 1
-        ? "RIGHT"
+        ? Direction.RIGHT
         : diff_pos.x === -1
-        ? "LEFT"
+        ? Direction.LEFT
         : diff_pos.y === 1
-        ? "DOWN"
-        : "UP";
+        ? Direction.DOWN
+        : Direction.UP;
+
+
+      map.tile(this.pos.x, this.pos.y, true).on_walk(map, this, direction);
 
   }
 

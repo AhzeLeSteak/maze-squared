@@ -1,5 +1,5 @@
-import { Game } from "@/Engine/Game";
-import { degreToRadian, pi, pi_over_2 } from "@/Engine/utils";
+import {Game} from "@/Engine/Game";
+import {degreToRadian, pi, pi_over_2} from "@/Engine/utils";
 
 export class Controller {
   private UP = false;
@@ -27,7 +27,6 @@ export class Controller {
     let base_angle = this.game.player.angle;
 
     if (side)
-      //si on
       diff_angle = this.STRAFE_RIGHT ? pi_over_2 : -pi_over_2;
     if (forward) {
       if (this.DOWN) base_angle += pi;

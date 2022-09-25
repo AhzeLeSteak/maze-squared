@@ -1,5 +1,5 @@
-import { Vector2 } from "@/Engine/Vector2";
-import { Game } from "@/Engine/Game";
+import {Vector2} from "@/Engine/Vector2";
+import {Game} from "@/Engine/Game";
 
 export abstract class AbstractTool {
 
@@ -7,6 +7,10 @@ export abstract class AbstractTool {
   }
 
   on_select(game: Game) {
+
+  }
+
+  on_unselect(game: Game){
 
   }
 

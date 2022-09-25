@@ -1,8 +1,15 @@
-import { Vector2 } from "./Vector2";
-import { Tile, WALL } from "@/Engine/Tiles/Tile";
-import { correct_angle, two_pi } from "@/Engine/utils";
+import {Vector2} from "./Vector2";
+import {Tile, WALL} from "@/Engine/Tiles/Tile";
+import {two_pi} from "@/Engine/utils";
+import {Teleporter} from "@/Engine/Tiles/Teleporter";
 
-
+export enum Direction{
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+    NONE
+}
 export class GameMap {
     // <editor-fold desc="Attributes and constructor">
     map_info = {
@@ -28,14 +35,39 @@ export class GameMap {
     }
 
     public load(): void {
-        this.map_info.boxes = new Array(this.size.x * this.size.y)
+        const array: number[] = new Array(this.size.x * this.size.y)
             .fill(0)
             .map((_, i) =>
                 i < this.size.x
                 || i > this.size.x * (this.size.y - 1)
                 || i % this.size.x === 0
                 || (i + 1) % this.size.x === 0
-                    ? new Tile(1) : new Tile(0));
+                    ? 1 : 0);
+        array[this.size.x+1] = 2;
+        array[this.size.x*2+1] = 1;
+        array[array.length - this.size.x - 2] = 2;
+        array[array.length - this.size.x*2 - 2] = 1;
+        this.load_from_array(array);
+    }
+
+    public load_from_array(tile_as_numbers: number[]){
+        this.map_info.boxes = [];
+        const teleporters: {[key: number]: Teleporter} = {};
+        for(let n of tile_as_numbers){
+            if(n < 2)
+                this.map_info.boxes.push(new Tile(n));
+            else{
+                const tp_type = n-2;
+                const new_tp = new Teleporter(tp_type);
+                if(teleporters[tp_type]){
+                    new_tp.twin = teleporters[tp_type];
+                    teleporters[tp_type].twin = new_tp;
+                }
+                else
+                    teleporters[tp_type] = new_tp;
+                this.map_info.boxes.push(new_tp);
+            }
+        }
     }
 
     vector_to_map_index(v: Vector2): number {
@@ -43,15 +75,19 @@ export class GameMap {
     }
 
     map_index_to_vector(i: number): Vector2 {
+        if(i < 0 || i > this.map_info.boxes.length)
+            throw new Error(i+' out of array bound');
         return {
             x: i % this.size.x,
             y: Math.floor(i / this.size.x)
         };
     }
 
-    tile(x: number, y: number, can_oob = false): Tile {
-        x = Math.floor(x);
-        y = Math.floor(y);
+    tile(x: number, y: number, parseInt = true, can_oob = false): Tile {
+        if(parseInt) {
+            x = Math.floor(x);
+            y = Math.floor(y);
+        }
         if (this.isOutOfBound({ x, y })) {
             if (can_oob) return WALL;
             throw new Error(`Out of bound : {x:${x}, y:${y}}`);
@@ -77,14 +113,16 @@ export class GameMap {
 
     getNextWall(v: Vector2, angle: number): { v: Vector2, distance: number, wallCol: number, orientation: "vertical" | "horizontal"; } {
         angle = (angle+two_pi)%two_pi;
-        let t: Tile;
+        v = {...v};
+        let t = this.getTileFromSideCoords(v, angle, true);
         let dist = 0;
         let orientation: "vertical" | "horizontal";
         do {
-            const next_point = this.getNextPoint(v, angle);
-            t = this.getTileFromSideCoords(next_point.v, angle);
+            const next_point = t.getNextPoint(this, v.x%1, v.y%1, angle);
             dist += next_point.dist;
-            v = next_point.v;
+            v.x += next_point.v.x;
+            v.y += next_point.v.y;
+            t = this.getTileFromSideCoords(v, angle);
             orientation = next_point.orientation;
         } while (t.solid === 0);
 
@@ -94,70 +132,19 @@ export class GameMap {
         return { v, distance: dist, orientation, wallCol };
     }
 
-    getNextPoint({ x, y }: Vector2, angle: number): { v: Vector2, dist: number, orientation: "vertical" | "horizontal" } {
-        const x_is_int = x === Math.floor(x);
-        const y_is_int = y === Math.floor(y);
-
-        if (angle === 0)
-            return { v: { x: x_is_int ? x + 1 : Math.ceil(x), y }, dist: 1, orientation: "horizontal" };
-        if (angle === Math.PI)
-            return { v: { x: x_is_int ? x - 1 : Math.floor(x), y }, dist: 1, orientation: "horizontal" };
-        if (angle === Math.PI * 3 / 2)
-            return { v: { x, y: y_is_int ? y - 1 : Math.floor(y) }, dist: 1, orientation: "vertical" };
-        if (angle === Math.PI / 2)
-            return { v: { x, y: y_is_int ? y + 1 : Math.ceil(y) }, dist: 1, orientation: "vertical" };
-
-        const face_left = angle >= Math.PI / 2 && angle <= Math.PI * 3 / 2;
-        const face_down = angle <= Math.PI;
-
-        let normalized_x = face_left ? x % 1 : 1 - (x % 1);
-        let normalized_y = !face_down ? y % 1 : 1 - (y % 1);
-        normalized_x = normalized_x === 0 ? 1 : normalized_x;
-        normalized_y = normalized_y === 0 ? 1 : normalized_y;
-
-
-        let next_y = normalized_x * Math.tan(face_left ? correct_angle(Math.PI - angle) : angle);
-        let next_x = normalized_y / Math.tan(face_down ? angle : correct_angle(Math.PI - angle));
-
-        const hypo_x = next_x / Math.cos(angle);
-        const hypo_y = next_y / Math.sin(angle);
-        let dist: number;
-        let orientation: "vertical" | "horizontal";
-
-        if (hypo_y < hypo_x) {
-            next_x = Math.round(x + normalized_x * (face_left ? -1 : 1));
-            next_y += y;
-            dist = hypo_y;
-            orientation = "vertical";
-        } else {
-            next_y = Math.round(y + normalized_y * (!face_down ? -1 : 1));
-            next_x += x;
-            dist = hypo_x;
-            orientation = "horizontal";
-        }
-
-        return {
-            v: {
-                x: next_x,
-                y: next_y
-            },
-            dist,
-            orientation
-        };
-        //this.getNextPoint({x: next_x, y: next_y}, angle, dist-1);
-    }
-
-    getTileFromSideCoords({ x, y }: Vector2, angle: number): Tile {
+    getTileFromSideCoords({ x, y }: Vector2, angle: number, initial = false): Tile {
         const x_is_int = x === Math.floor(x);
         const y_is_int = y === Math.floor(y);
 
         if (x_is_int) {
             const face_left = angle >= Math.PI / 2 && angle <= Math.PI * 3 / 2;
-            return this.tile(x + (face_left ? -1 : 0), Math.floor(y));
+            return this.tile(x + (face_left ? -1 : 0),  y, true);
         } else if (y_is_int) {
             const face_down = angle <= Math.PI;
-            return this.tile(Math.floor(x), y + (face_down ? 0 : -1));
+            return this.tile(x, y + (face_down ? 0 : -1), true);
         }
+        else if(initial)
+            return this.tile(x, y, true, false);
         throw new Error("Get Tile from Side coords");
     }
 
