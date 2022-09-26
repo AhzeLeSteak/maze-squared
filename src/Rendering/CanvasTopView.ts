@@ -1,8 +1,9 @@
-import {Game} from "@/Engine/Game";
-import {Vector2} from "@/Engine/Vector2";
-import {degreToRadian} from "@/Engine/utils";
-import {Canvas2D} from "./Abstract/Canvas2D";
-import {Teleporter, TP_TYPE_NAMES} from "@/Engine/Tiles/Teleporter";
+import { Game } from "@/Engine/Game";
+import { Vector2 } from "@/Engine/Vector2";
+import { degreToRadian } from "@/Engine/utils";
+import { Canvas2D } from "./Abstract/Canvas2D";
+import { Teleporter, TP_TYPE_NAMES } from "@/Engine/Tiles/Teleporter";
+import { Orientation } from "@/Engine/GameMap";
 
 export class CanvasTopView extends Canvas2D {
 
@@ -33,28 +34,28 @@ export class CanvasTopView extends Canvas2D {
                 if (tile.tile_type === "base") {
                     this.contextd2D.fillStyle = ["grey", "black"][tile.solid] ?? "yellow";
                     this.drawSquare(
-                        x * tile_size + 1,
-                        y * tile_size + 1,
-                        tile_size - 2,
-                        tile_size - 2
+                      x * tile_size + 1,
+                      y * tile_size + 1,
+                      tile_size - 2,
+                      tile_size - 2
                     );
                 } else if (tile.tile_type === "teleporter") {
                     const tp = tile as Teleporter;
                     const img = document.getElementById(TP_TYPE_NAMES[tp.teleporter_type]) as CanvasImageSource;
                     if (!img) continue;
                     this.contextd2D.drawImage(img,
-                        0, 0, 16, 16,
-                        x * tile_size + 1,
-                        y * tile_size + 1,
-                        tile_size - 2,
-                        tile_size - 2);
-                    this.contextd2D.fillStyle = 'rgba(208,17,17,0.42)'
-                    if(tp.rotation)
-                    this.drawSquare(
-                        x * tile_size + 1,
-                        y * tile_size + 1,
-                        tile_size - 2,
-                        tile_size - 2)
+                      0, 0, 16, 16,
+                      x * tile_size + 1,
+                      y * tile_size + 1,
+                      tile_size - 2,
+                      tile_size - 2);
+                    this.contextd2D.fillStyle = "rgba(208,17,17,0.42)";
+                    if (tp.rotation)
+                        this.drawSquare(
+                          x * tile_size + 1,
+                          y * tile_size + 1,
+                          tile_size - 2,
+                          tile_size - 2);
                 }
             }
         }
@@ -62,35 +63,48 @@ export class CanvasTopView extends Canvas2D {
         if(this.draw_player) {
             const player_pos: Vector2 = { ...game.player.pos };
 
-
-            //affichage du rayon face au joueur
-            const { v, distance } = game.map.getNextWall(player_pos, game.player.angle);
-            this.contextd2D.fillStyle = "red";
-            this.drawLine(player_pos.x * tile_size, player_pos.y * tile_size, v.x * tile_size, v.y * tile_size);
-            const tile = game.map.getTileFromSideCoords(v, game.player.angle);
-            const tile_coords = game.map.getCoordsOfTile(tile);
-            this.drawSquare(tile_coords.x * tile_size, tile_coords.y * tile_size, tile_size, tile_size);
-            this.contextd2D.fillStyle = "darkblue";
-            this.contextd2D.fillText(distance.toString().substring(0, 4), (player_pos.x + v.x)*tile_size/2, (player_pos.y + v.y)*tile_size/2)
-
-
             //affichage du champ de vision
-            for (let i = -game.view_angle / 2; i < game.view_angle / 2; i++) {
+            for (let i = -game.view_angle / 2; false && i < game.view_angle / 2; i++) {
                 for (let j = 0; j < 1; j++) {
                     const angle = game.player.angle + (i + j / 2) * degreToRadian;
-                    const nextWall = map.getNextWall(game.player.pos, angle);
-                    nextWall.orientation === "horizontal"
-                        ? this.setColor(55, 200, 40)
-                        : this.setColor(50, 85, 255);
-                    this.drawLine(
-                        player_pos.x * tile_size,
-                        player_pos.y * tile_size,
-                        nextWall.v.x * tile_size,
-                        nextWall.v.y * tile_size
-                    );
+                    const nextWall = map.get_next_wall(game.player.pos, angle);
+                    nextWall.orientation === Orientation.HORIZONTAL
+                      ? this.setColor(55, 200, 40)
+                      : this.setColor(50, 85, 255);
+                    for (let i = 0; i < nextWall.points.length - 1; i++) {
+                        const p1 = nextWall.points[i];
+                        const p2 = nextWall.points[i + 1];
+                        this.drawLine(
+                          p1.x * tile_size,
+                          p1.y * tile_size,
+                          p2.x * tile_size,
+                          p2.y * tile_size
+                        );
+                    }
+
 
                 }
             }
+            //affichage du rayon face au joueur
+            const { v, distance, points } = game.map.get_next_wall(player_pos, game.player.angle);
+            this.contextd2D.fillStyle = "red";
+            for (let i = 0; i < points.length - 1; i++) {
+                const p1 = points[i];
+                const p2 = points[i + 1];
+                this.drawLine(
+                  p1.x * tile_size,
+                  p1.y * tile_size,
+                  p2.x * tile_size,
+                  p2.y * tile_size
+                );
+            }
+
+
+            const tile = game.map.get_tile_from_side_coords(v, game.player.angle);
+            const tile_coords = game.map.get_coords_of_tile(tile);
+            this.drawSquare(tile_coords.x * tile_size, tile_coords.y * tile_size, tile_size, tile_size);
+            this.contextd2D.fillStyle = "darkblue";
+            this.contextd2D.fillText(distance.toString().substring(0, 4), (player_pos.x + v.x) * tile_size / 2, (player_pos.y + v.y) * tile_size / 2);
 
 
             //surbrillance de la case où se situe le joueur
@@ -107,10 +121,10 @@ export class CanvasTopView extends Canvas2D {
             this.contextd2D.fillStyle = "red";
             const player_size = 8;
             this.drawSquare(
-                player_pos.x*tile_size - player_size / 2,
-                player_pos.y*tile_size - player_size / 2,
-                player_size,
-                player_size
+              player_pos.x * tile_size - player_size / 2,
+              player_pos.y * tile_size - player_size / 2,
+              player_size,
+              player_size
             );
 
 
@@ -118,9 +132,9 @@ export class CanvasTopView extends Canvas2D {
             this.contextd2D.fillStyle = "black";
             this.contextd2D.font = "16px Comic sans";
             this.contextd2D.fillText(
-                (game.player.angle / degreToRadian + "").substr(0, 5),
-                player_pos.x + 10,
-                player_pos.y + 10
+              (game.player.angle / degreToRadian + "").substr(0, 5),
+              player_pos.x + 10,
+              player_pos.y + 10
             );
         }
 

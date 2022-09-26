@@ -1,8 +1,9 @@
-import {Game} from "@/Engine/Game";
-import {degreToRadian} from "@/Engine/utils";
-import {textures} from "@/Engine/Texture/load_textures";
-import {Pixel} from "@/Engine/Texture/Texture";
-import {CanvasWebGL} from "./Abstract/CanvalWebGL";
+import { Game } from "@/Engine/Game";
+import { degreToRadian } from "@/Engine/utils";
+import { textures } from "@/Engine/Texture/load_textures";
+import { Pixel } from "@/Engine/Texture/Texture";
+import { CanvasWebGL } from "./Abstract/CanvalWebGL";
+import { Orientation } from "@/Engine/GameMap";
 
 
 const SAMPLE_SIZE = 10;
@@ -14,8 +15,8 @@ export class CanvasRaycast extends CanvasWebGL {
     private shadow_ratio = 0.2;
     private context2D: CanvasRenderingContext2D;
 
-    constructor(width: number, height?: number) {
-        super({ x: width, y: height || (width * 9) / 16 });
+    constructor(width: number, height: number, canvas: HTMLCanvasElement) {
+        super({ x: width, y: height }, canvas);
         this.context2D = this.createCanvas().getContext("2d")!;
         this.resizeCanvasHtml(this.context2D.canvas, this.size);
         this.context2D.font = "16px Comic sans";
@@ -42,16 +43,16 @@ export class CanvasRaycast extends CanvasWebGL {
         for (let base_x = 0; base_x < this.size.x; base_x+=col_size) {
             const ray_diff_angle = (((base_x - this.size.x / 2) * game.view_angle) / this.size.x) * degreToRadian;
             const ray_angle = game.player.angle + ray_diff_angle; // get the angle of the actual ray
-            const nextWall = map.getNextWall(player_pos, ray_angle); // calculate where the ray goes
+            const nextWall = map.get_next_wall(player_pos, ray_angle); // calculate where the ray goes
 
-            const t = textures.get(nextWall.orientation === "vertical" ? "wall" : "wall_2")!;
+            const t = textures.get(nextWall.orientation === Orientation.VERTICAL ? "wall" : "wall_2")!;
             const tile_size = t.columns.length;
             const dist = nextWall.distance * tile_size * Math.cos(ray_diff_angle); // diff_angle to fix fish eye effect
 
             const lineHeight =
-                nextWall.distance === Infinity
-                    ? 0
-                    : Math.floor((tile_size * this.size.y) / dist);
+              nextWall.distance === Infinity
+                ? 0
+                : Math.floor((tile_size * this.size.y) / dist);
             const tile_y_step = 1 / tile_size;
             const tile_y_offset = 0;
 

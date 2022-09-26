@@ -11,8 +11,8 @@ export abstract class CanvasWebGL extends Canvas {
   private lines_vertex = [] as number[];
   private triangle_vertex = [] as number[];
 
-  protected constructor(size: Vector2) {
-    super(size);
+  protected constructor(size: Vector2, canvas: HTMLCanvasElement) {
+    super(size, canvas);
     this.gl = this.canvas.getContext("webgl2")!;
     this.setupWebGl();
     this.reset();

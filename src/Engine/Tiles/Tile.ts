@@ -1,7 +1,7 @@
-import {Vector2} from "@/Engine/Vector2";
-import {correct_angle} from "@/Engine/utils";
-import {Direction, GameMap} from "@/Engine/GameMap";
-import {Player} from "@/Engine/Player";
+import { Vector2 } from "@/Engine/Vector2";
+import { correct_angle } from "@/Engine/utils";
+import { Direction, GameMap, Orientation } from "@/Engine/GameMap";
+import { Player } from "@/Engine/Player";
 
 type TileType = "base" | "teleporter";
 
@@ -14,25 +14,32 @@ export class Tile {
     }
 
 
-    /**
-     * Calcule la nouvelle position d'un point à partir d'un angle donné
-     * @param map carte de jeu
-     * @param x Nombre [0;1[
-     * @param y Nombre [0; 1[
-     * @param angle Nombre [0; 2pi[
-     */
-    getNextPoint(map: GameMap, x: number, y: number, angle: number): { v: Vector2, dist: number, orientation: "vertical" | "horizontal" } {
-        const x_is_int = x === 0;
-        const y_is_int = y === 0;
+    getNextPoint(map: GameMap, exploration: { v: Vector2, angle: number, distance: number, orientation: Orientation }): void {
+        const x = exploration.v.x % 1;
+        const y = exploration.v.y % 1;
+        const angle = exploration.angle;
 
-        if (angle === 0) //vers la droits
-            return { v: { x: x_is_int ? 1 : 1-x, y: 0 }, dist: 1, orientation: "horizontal" };
-        if (angle === Math.PI) //vers la gauche
-            return { v: { x: x_is_int ? -1 : -x, y: 0 }, dist: 1, orientation: "horizontal" };
-        if (angle === Math.PI * 3 / 2) //vers le haut
-            return { v: { x: 0, y: y_is_int ? -1 :  -y }, dist: 1, orientation: "vertical" };
-        if (angle === Math.PI / 2) //vers le bas
-            return { v: { x: 0, y: y_is_int ? 1 : 1 - y }, dist: 1, orientation: "vertical" };
+        if (angle === 0) { //vers la droite
+            exploration.v.x++;
+            exploration.distance++;
+            exploration.orientation = Orientation.HORIZONTAL;
+            return;
+        }
+        if (angle === Math.PI) { //vers la gauche
+            exploration.v.x--;
+            exploration.distance++;
+            exploration.orientation = Orientation.HORIZONTAL;
+        }
+        if (angle === Math.PI * 3 / 2) { //vers le haut
+            exploration.v.y--;
+            exploration.distance++;
+            exploration.orientation = Orientation.VERTICAL;
+        }
+        if (angle === Math.PI / 2) { //vers le bas
+            exploration.v.y++;
+            exploration.distance++;
+            exploration.orientation = Orientation.VERTICAL;
+        }
 
         const face_left = angle >= Math.PI / 2 && angle <= Math.PI * 3 / 2;
         const face_down = angle <= Math.PI;
@@ -48,27 +55,18 @@ export class Tile {
 
         const hypo_x = next_x / Math.cos(angle);
         const hypo_y = next_y / Math.sin(angle);
-        let dist: number;
-        let orientation: "vertical" | "horizontal";
 
         if (hypo_y < hypo_x) {
-            next_x = normalized_x * (face_left ? -1 : 1);
-            dist = hypo_y;
-            orientation = "vertical";
+            exploration.v.y += next_y;
+            exploration.v.x += normalized_x * (face_left ? -1 : 1);
+            exploration.distance += hypo_y;
+            exploration.orientation = Orientation.VERTICAL;
         } else {
-            next_y = normalized_y * (!face_down ? -1 : 1);
-            dist = hypo_x;
-            orientation = "horizontal";
+            exploration.v.x += next_x;
+            exploration.v.y += normalized_y * (face_down ? 1 : -1);
+            exploration.distance += hypo_x;
+            exploration.orientation = Orientation.HORIZONTAL;
         }
-
-        return {
-            v: {
-                x: next_x,
-                y: next_y
-            },
-            dist,
-            orientation
-        };
     }
 
     on_walk(map: GameMap, player: Player, d: Direction){

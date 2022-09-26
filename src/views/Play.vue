@@ -1,16 +1,22 @@
 <template>
 
-  <div id="canvas-container"></div>
+  <div id="canvas-container">
+    <canvas id="play-canvas"
+            class="centered"
+            style="z-index: 10"
+            @mousemove="change_player_direction($event.movementX)"
+    ></canvas>
+  </div>
 
 </template>
 
 <script lang="ts">
-import {defineComponent, PropType} from "vue";
-import {Game} from "@/Engine/Game";
-import {CanvasRaycast} from "@/Rendering/CanvasRaycast";
+import { defineComponent, PropType } from "vue";
+import { Game } from "@/Engine/Game";
+import { CanvasRaycast } from "@/Rendering/CanvasRaycast";
 
 export default defineComponent({
-  name: 'Play',
+  name: "Play",
   props: {
     game: {
       type: Object as PropType<Game>,
@@ -18,10 +24,22 @@ export default defineComponent({
     }
   },
   mounted() {
-    this.game.start_loop(new CanvasRaycast(window.innerWidth*.8, window.innerHeight*.8));
+    this.game.start_loop(new CanvasRaycast(window.innerWidth * .8, window.innerHeight * .8, document.getElementById("play-canvas") as HTMLCanvasElement));
   },
   unmounted() {
     this.game.stop();
+  },
+  methods: {
+    change_player_direction(dx: number) {
+      this.game.player.addAngle(dx / 500);
+
+    }
   }
-})
+});
 </script>
+
+<style>
+#play-canvas {
+  cursor: none;
+}
+</style>

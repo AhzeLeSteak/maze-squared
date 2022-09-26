@@ -1,14 +1,21 @@
-import {Vector2} from "./Vector2";
-import {Tile, WALL} from "@/Engine/Tiles/Tile";
-import {two_pi} from "@/Engine/utils";
-import {Teleporter} from "@/Engine/Tiles/Teleporter";
+import { Vector2 } from "./Vector2";
+import { Tile, WALL } from "@/Engine/Tiles/Tile";
+import { two_pi } from "@/Engine/utils";
+import { Teleporter } from "@/Engine/Tiles/Teleporter";
 
-export enum Direction{
+export enum Direction {
     UP,
     RIGHT,
     DOWN,
     LEFT,
 }
+
+export enum Orientation {
+    HORIZONTAL,
+    VERTICAL
+}
+
+
 export class GameMap {
     // <editor-fold desc="Attributes and constructor">
     map_info = {
@@ -106,38 +113,35 @@ export class GameMap {
     // </editor-fold>
 
     // <editor-fold desc="Map exploration">
-    getCoordsOfTile(tile: Tile) {
+    get_coords_of_tile(tile: Tile) {
         return this.map_index_to_vector(this.boxes.findIndex(t => t === tile));
     }
 
-    getNextWall(v: Vector2, angle: number): { v: Vector2, distance: number, wallCol: number, orientation: "vertical" | "horizontal"; } {
-        angle = (angle+two_pi)%two_pi;
-        v = {...v};
-        let t = this.getTileFromSideCoords(v, angle, true);
-        let dist = 0;
-        let orientation: "vertical" | "horizontal";
+    get_next_wall(v: Vector2, angle: number) {
+        angle = (angle + two_pi) % two_pi;
+        v = { ...v };
+        const points: Vector2[] = [{ ...v }];
+        let t = this.get_tile_from_side_coords(v, angle, true);
+        const exploration = { v, angle, distance: 0, orientation: Orientation.HORIZONTAL };
         do {
-            const next_point = t.getNextPoint(this, v.x%1, v.y%1, angle);
-            dist += next_point.dist;
-            v.x += next_point.v.x;
-            v.y += next_point.v.y;
-            t = this.getTileFromSideCoords(v, angle);
-            orientation = next_point.orientation;
+            t.getNextPoint(this, exploration);
+            points.push({ ...exploration.v });
+            t = this.get_tile_from_side_coords(exploration.v, angle);
         } while (t.solid === 0);
 
-        const wallCol = (orientation === "horizontal" ? v.x : v.y) % 1;
+        const wallCol = (exploration.orientation === Orientation.HORIZONTAL ? v.x : v.y) % 1;
 
 
-        return { v, distance: dist, orientation, wallCol };
+        return { ...exploration, wallCol, points };
     }
 
-    getTileFromSideCoords({ x, y }: Vector2, angle: number, initial = false): Tile {
+    get_tile_from_side_coords({ x, y }: Vector2, angle: number, initial = false): Tile {
         const x_is_int = x === Math.floor(x);
         const y_is_int = y === Math.floor(y);
 
         if (x_is_int) {
             const face_left = angle >= Math.PI / 2 && angle <= Math.PI * 3 / 2;
-            return this.tile(x + (face_left ? -1 : 0),  y, true);
+            return this.tile(x + (face_left ? -1 : 0), y, true);
         } else if (y_is_int) {
             const face_down = angle <= Math.PI;
             return this.tile(x, y + (face_down ? 0 : -1), true);
