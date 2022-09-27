@@ -35,38 +35,43 @@ export class Teleporter extends Tile {
 
     public twin !: Teleporter;
 
-    constructor(public readonly teleporter_type: TeleporterType, public rotation = false) {
+    constructor(public readonly teleporter_type: TeleporterType, public entrance = Direction.DOWN) {
         super(0);
         this.tile_type = "teleporter";
     }
 
 
-    getNextPoint(map: GameMap, exploration: { v: Vector2, angle: number, distance: number, orientation: Orientation }, points: Lines): void {
+    getNextPoint(map: GameMap, exploration: { v: Vector2, angle: number, distance: number, orientation: Orientation }, points: Lines): boolean {
 
         const direction =
           (exploration.v.x % 1 === 0)
             ? (angle_faces_left(exploration.angle) ? Direction.LEFT : Direction.RIGHT)
             : (angle_faces_down(exploration.angle) ? Direction.DOWN : Direction.UP)
         ;
+        if (direction !== (this.entrance + 2) % 4)
+            return true;
+
         this.teleport(map, exploration.v, direction, points);
-        if (this.rotation) {
+        const nb_rotation = ((2 + this.twin.entrance - this.entrance) % 4);
+        if (nb_rotation > 0) {
+            const tp_angle = pi_over_2 * nb_rotation;
             const twin_coord = map.get_coords_of_tile(this.twin);
-            rotate_point({ x: twin_coord.x + .5, y: twin_coord.y + .5 }, pi_over_2, exploration.v);
-            exploration.angle = correct_angle(exploration.angle + pi_over_2);
+            rotate_point({ x: twin_coord.x + .5, y: twin_coord.y + .5 }, tp_angle, exploration.v);
+            exploration.angle = correct_angle(exploration.angle + tp_angle);
             points.pop();
             points.push({ ...exploration.v, stop: true });
         }
-        super.getNextPoint(map, exploration, points);
+        return super.getNextPoint(map, exploration, points);
     }
 
     on_walk(map: GameMap, player: Player, walk_direction: Direction) {
         super.on_walk(map, player, walk_direction);
         this.teleport(map, player.pos, walk_direction);
-        if (this.rotation) {
-            const twin_coord = map.get_coords_of_tile(this.twin);
-            rotate_point({ x: twin_coord.x + .5, y: twin_coord.y + .5 }, pi_over_2, player.pos);
-            player.angle = correct_angle(player.angle + pi_over_2);
-        }
+        // if (this.rotation) {
+        //     const twin_coord = map.get_coords_of_tile(this.twin);
+        //     rotate_point({ x: twin_coord.x + .5, y: twin_coord.y + .5 }, pi_over_2, player.pos);
+        //     player.angle = correct_angle(player.angle + pi_over_2);
+        // }
     }
 
     teleport(map: GameMap, pos: Vector2, direction: Direction, points ?: Lines) {

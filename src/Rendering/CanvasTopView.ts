@@ -3,7 +3,7 @@ import { Vector2 } from "@/Engine/Vector2";
 import { degreToRadian } from "@/Engine/utils";
 import { Canvas2D } from "./Abstract/Canvas2D";
 import { Teleporter, TP_TYPE_NAMES } from "@/Engine/Tiles/Teleporter";
-import { Orientation } from "@/Engine/GameMap";
+import { Direction, Orientation } from "@/Engine/GameMap";
 
 export class CanvasTopView extends Canvas2D {
 
@@ -49,13 +49,14 @@ export class CanvasTopView extends Canvas2D {
                       y * tile_size + 1,
                       tile_size - 2,
                       tile_size - 2);
-                    this.contextd2D.fillStyle = "rgba(208,17,17,0.42)";
-                    if (tp.rotation)
-                        this.drawSquare(
-                          x * tile_size + 1,
-                          y * tile_size + 1,
-                          tile_size - 2,
-                          tile_size - 2);
+                    this.contextd2D.fillStyle = "rgba(66,58,58,0.9)";
+                    const width = tile_size / 5;
+                    this.drawSquare(
+                      x * tile_size + (tp.entrance === Direction.RIGHT ? tile_size - width : 0),
+                      y * tile_size + (tp.entrance === Direction.DOWN ? tile_size - width : 0),
+                      [Direction.UP, Direction.DOWN].includes(tp.entrance) ? tile_size : width,
+                      [Direction.LEFT, Direction.RIGHT].includes(tp.entrance) ? tile_size : width
+                    );
                 }
             }
         }

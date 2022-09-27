@@ -14,7 +14,7 @@ export class Tile {
     }
 
 
-    getNextPoint(map: GameMap, exploration: { v: Vector2, angle: number, distance: number, orientation: Orientation }, lines: Lines): void {
+    getNextPoint(map: GameMap, exploration: { v: Vector2, angle: number, distance: number, orientation: Orientation }, lines: Lines): boolean {
         const x = exploration.v.x % 1;
         const y = exploration.v.y % 1;
         const angle = exploration.angle;
@@ -23,22 +23,25 @@ export class Tile {
             exploration.v.x++;
             exploration.distance++;
             exploration.orientation = Orientation.HORIZONTAL;
-            return;
+            return true;
         }
         if (angle === Math.PI) { //vers la gauche
             exploration.v.x--;
             exploration.distance++;
             exploration.orientation = Orientation.HORIZONTAL;
+            return true;
         }
         if (angle === Math.PI * 3 / 2) { //vers le haut
             exploration.v.y--;
             exploration.distance++;
             exploration.orientation = Orientation.VERTICAL;
+            return true;
         }
         if (angle === Math.PI / 2) { //vers le bas
             exploration.v.y++;
             exploration.distance++;
             exploration.orientation = Orientation.VERTICAL;
+            return true;
         }
 
         const face_left = angle >= Math.PI / 2 && angle <= Math.PI * 3 / 2;
@@ -67,6 +70,8 @@ export class Tile {
             exploration.distance += hypo_x;
             exploration.orientation = Orientation.HORIZONTAL;
         }
+
+        return false;
     }
 
     on_walk(map: GameMap, player: Player, d: Direction){

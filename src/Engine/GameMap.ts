@@ -3,11 +3,11 @@ import { Tile, WALL } from "@/Engine/Tiles/Tile";
 import { two_pi } from "@/Engine/utils";
 import { Teleporter } from "@/Engine/Tiles/Teleporter";
 
-export enum Direction {
-    UP,
+export enum Direction { //dans l'ordre trigonométrique
     RIGHT,
     DOWN,
     LEFT,
+    UP,
 }
 
 export enum Orientation {
@@ -125,7 +125,8 @@ export class GameMap {
         let end = false;
         const exploration = { v, angle, distance: 0, orientation: Orientation.HORIZONTAL };
         do {
-            t.getNextPoint(this, exploration, points);
+            if (t.getNextPoint(this, exploration, points))
+                break;
             points.push({ ...exploration.v });
             t = this.get_tile_from_side_coords(exploration.v, angle);
             end = t.solid === 1 || exploration.distance > 100;
