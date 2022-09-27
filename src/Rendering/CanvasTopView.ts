@@ -88,9 +88,11 @@ export class CanvasTopView extends Canvas2D {
             //affichage du rayon face au joueur
             const { v, distance, points } = game.map.get_next_wall(player_pos, game.player.angle);
             this.contextd2D.fillStyle = "red";
-            for (let i = 0; i < points.length - 1; i++) {
+            for (let i = 0; i < points.length - 1 && i < 64; i++) {
                 const p1 = points[i];
                 const p2 = points[i + 1];
+                if (p2.stop)
+                    continue;
                 this.drawLine(
                   p1.x * tile_size,
                   p1.y * tile_size,

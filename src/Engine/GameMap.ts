@@ -1,4 +1,4 @@
-import { Vector2 } from "./Vector2";
+import { Lines, Vector2 } from "./Vector2";
 import { Tile, WALL } from "@/Engine/Tiles/Tile";
 import { two_pi } from "@/Engine/utils";
 import { Teleporter } from "@/Engine/Tiles/Teleporter";
@@ -120,14 +120,16 @@ export class GameMap {
     get_next_wall(v: Vector2, angle: number) {
         angle = (angle + two_pi) % two_pi;
         v = { ...v };
-        const points: Vector2[] = [{ ...v }];
+        const points: Lines = [{ ...v }];
         let t = this.get_tile_from_side_coords(v, angle, true);
+        let end = false;
         const exploration = { v, angle, distance: 0, orientation: Orientation.HORIZONTAL };
         do {
-            t.getNextPoint(this, exploration);
+            t.getNextPoint(this, exploration, points);
             points.push({ ...exploration.v });
             t = this.get_tile_from_side_coords(exploration.v, angle);
-        } while (t.solid === 0);
+            end = t.solid === 1 || exploration.distance > 100;
+        } while (!end);
 
         const wallCol = (exploration.orientation === Orientation.HORIZONTAL ? v.x : v.y) % 1;
 

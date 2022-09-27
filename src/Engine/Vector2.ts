@@ -1,17 +1,16 @@
-type Vector2 = {
+export type Vector2 = {
   x: number;
   y: number;
 };
 
-const infinite: Vector2 = {
+export type Lines = Array<Vector2 & { stop?: boolean }>
+
+export const infinite: Vector2 = {
   x: Infinity,
-  y: Infinity,
+  y: Infinity
 };
 
-function distance(v1: Vector2, v2: Vector2): number {
-  return Math.sqrt(
-    (v1.x - v2.x) * (v1.x - v2.x) + (v1.y - v2.y) * (v1.y - v2.y)
-  );
-}
+export const distance = (v1: Vector2, v2: Vector2): number => Math.sqrt(
+  (v1.x - v2.x) * (v1.x - v2.x) + (v1.y - v2.y) * (v1.y - v2.y)
+);
 
-export { Vector2, infinite, distance };

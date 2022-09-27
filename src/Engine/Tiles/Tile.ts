@@ -1,4 +1,4 @@
-import { Vector2 } from "@/Engine/Vector2";
+import { Lines, Vector2 } from "@/Engine/Vector2";
 import { correct_angle } from "@/Engine/utils";
 import { Direction, GameMap, Orientation } from "@/Engine/GameMap";
 import { Player } from "@/Engine/Player";
@@ -14,7 +14,7 @@ export class Tile {
     }
 
 
-    getNextPoint(map: GameMap, exploration: { v: Vector2, angle: number, distance: number, orientation: Orientation }): void {
+    getNextPoint(map: GameMap, exploration: { v: Vector2, angle: number, distance: number, orientation: Orientation }, lines: Lines): void {
         const x = exploration.v.x % 1;
         const y = exploration.v.y % 1;
         const angle = exploration.angle;

@@ -36,7 +36,7 @@ export class CanvasRaycast extends CanvasWebGL {
         const player_pos = game.player.pos;
 
         const col_size = 8; //numbers of columns grouped for rendering
-        const col_size_floors = 8;
+        const col_size_floors = 16;
 
         let prev_dist = 0;
 
@@ -111,12 +111,7 @@ export class CanvasRaycast extends CanvasWebGL {
                         // 	this.drawHorizontalLine(x, last_draw_y, y);
                         // }
                         this.drawRectangle(base_x, last_draw_y, col_size_floors, y - last_draw_y);
-                        this.drawRectangle(
-                            base_x,
-                            this.size.y - last_draw_y,
-                            col_size_floors,
-                            this.size.y - y - last_draw_y
-                        );
+                        //this.drawRectangle(base_x, this.size.y - last_draw_y, col_size_floors, this.size.y - y - last_draw_y);
                         last_draw_y = y;
                     }
                 }
