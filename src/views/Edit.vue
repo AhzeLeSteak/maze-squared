@@ -15,6 +15,7 @@
             @mouseup="level_editor.dragging = -1"
             @contextmenu="level_editor.context_menu($event)"
             @mousemove="level_editor.mouse_move($event)"
+            @mouseleave="level_editor.mouse_leave($event)"
     ></canvas>
 
 
@@ -30,10 +31,10 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, PropType} from "vue";
-import {Game} from "@/Engine/Game";
-import {CanvasTopView} from "@/Rendering/CanvasTopView";
-import {LevelEditor} from "@/Engine/LevelEditor/LevelEditor";
+import { defineComponent, PropType } from "vue";
+import { Game } from "@/Engine/Game";
+import { CanvasTopView } from "@/Rendering/CanvasTopView";
+import { LevelEditor } from "@/Engine/LevelEditor/LevelEditor";
 
 
 export default defineComponent({
@@ -52,7 +53,7 @@ export default defineComponent({
   mounted() {
     const tile_size = 64;
     const canvas = document.getElementById("top-view") as HTMLCanvasElement;
-    const renderer =new CanvasTopView(this.game, tile_size, canvas);
+    const renderer = new CanvasTopView(this.game, tile_size, canvas);
     this.level_editor = new LevelEditor(this.game, renderer);
     this.game.start_loop(renderer);
 
@@ -64,7 +65,7 @@ export default defineComponent({
     tool_style(txt_name: string, index: number) {
       return `background-image: url("assets/ui/toolbox/${txt_name}.png");`
         + (index === this.level_editor?.tool_index
-          ? "border: 2px solid blue"
+          ? "outline: 4px solid red;"
           : "");
     }
   }
@@ -75,7 +76,8 @@ export default defineComponent({
   .toolbox {
     --size: 68px;
     display: grid;
-    grid-template: repeat(10, var(--size)) / repeat(1, var(--size));
+    grid-template: repeat(5, var(--size)) / repeat(2, var(--size));
+    gap: 4px;
   }
 
   .toolbox button{

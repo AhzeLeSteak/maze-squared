@@ -1,5 +1,5 @@
-import {Game} from "@/Engine/Game";
-import {degreToRadian, pi, pi_over_2} from "@/Engine/utils";
+import { Game } from "@/Engine/Game";
+import { degreToRadian, pi, pi_over_2 } from "@/Engine/Geometry/utils";
 
 export class Controller {
   private UP = false;

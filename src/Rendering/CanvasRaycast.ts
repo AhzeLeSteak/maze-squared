@@ -1,5 +1,5 @@
 import { Game } from "@/Engine/Game";
-import { degreToRadian } from "@/Engine/utils";
+import { degreToRadian } from "@/Engine/Geometry/utils";
 import { textures } from "@/Engine/Texture/load_textures";
 import { Pixel } from "@/Engine/Texture/Texture";
 import { CanvasWebGL } from "./Abstract/CanvalWebGL";

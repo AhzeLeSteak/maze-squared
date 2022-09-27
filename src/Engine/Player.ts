@@ -1,17 +1,18 @@
-import {Vector2} from "@/Engine/Vector2";
-import {correct_angle, pi_over_2} from "@/Engine/utils";
-import {Direction, GameMap} from "@/Engine/GameMap";
+import { Vector2 } from "@/Engine/Geometry/Vector2";
+import { correct_angle, pi_over_2 } from "@/Engine/Geometry/utils";
+import { GameMap } from "@/Engine/GameMap";
+import { Direction } from "@/Engine/Geometry/Direction";
 
 export class Player {
   /**
    * Angle en radian
    */
-  public angle = pi_over_2;
+  public angle = pi_over_2 + 0.1;
   public readonly speed = 2; //tile per second
   public readonly rotation_speed = 120; // deg per second
 
   constructor(public pos: Vector2) {
-
+    this.pos = { x: pos.x + .5, y: pos.y + .5 };
   }
 
   addAngle(da: number): void {
@@ -21,29 +22,28 @@ export class Player {
 
   walk(map: GameMap, dt: number, angle = this.angle): void {
     const nextPoint = this.getNextPointWalking(dt, angle);
-    const old_pos: Vector2 = { ...this.pos };
-    if (!map.tile(nextPoint.x, nextPoint.y, true).solid) {
-      this.pos.x = nextPoint.x;
-      this.pos.y = nextPoint.y;
-    }
 
     const diff_pos: Vector2 = {
-      x: Math.floor(this.pos.x) - Math.floor(old_pos.x),
-      y: Math.floor(this.pos.y) - Math.floor(old_pos.y),
+      x: Math.floor(nextPoint.x) - Math.floor(this.pos.x),
+      y: Math.floor(nextPoint.y) - Math.floor(this.pos.y)
     };
 
     const direction =
       diff_pos.x === 1
         ? Direction.RIGHT
         : diff_pos.x === -1
-        ? Direction.LEFT
-        : diff_pos.y === 1
-        ? Direction.DOWN
-        : Direction.UP;
+          ? Direction.LEFT
+          : diff_pos.y === 1
+            ? Direction.DOWN
+            : Direction.UP;
+
+    if (map.tile(nextPoint.x, nextPoint.y, true, true).can_go_through(direction)) {
+      this.pos.x = nextPoint.x;
+      this.pos.y = nextPoint.y;
+    }
 
 
-      map.tile(this.pos.x, this.pos.y, true).on_walk(map, this, direction);
-
+    map.tile(this.pos.x, this.pos.y, true).on_walk(map, this, direction);
   }
 
   getNextPointWalking(

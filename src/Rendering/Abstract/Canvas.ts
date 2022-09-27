@@ -1,5 +1,5 @@
-import {Vector2} from "@/Engine/Vector2";
-import {Game} from "@/Engine/Game";
+import { Vector2 } from "@/Engine/Geometry/Vector2";
+import { Game } from "@/Engine/Game";
 
 export abstract class Canvas {
     private static id = 0;

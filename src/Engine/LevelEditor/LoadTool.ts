@@ -1,0 +1,16 @@
+import { AbstractTool } from "@/Engine/LevelEditor/AbstractTool";
+import { Game } from "@/Engine/Game";
+
+export class LoadTool extends AbstractTool {
+
+  constructor() {
+    super("load", "Load level", false);
+  }
+
+  on_select(game: Game) {
+    const map_info = localStorage.getItem("map");
+    if (map_info)
+      game.map.load_from_serialized(JSON.parse(map_info));
+  }
+
+}

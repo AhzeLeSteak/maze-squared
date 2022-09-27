@@ -1,7 +1,8 @@
-import { Lines, Vector2 } from "@/Engine/Vector2";
-import { correct_angle } from "@/Engine/utils";
-import { Direction, GameMap, Orientation } from "@/Engine/GameMap";
+import { Lines, Vector2 } from "@/Engine/Geometry/Vector2";
+import { correct_angle } from "@/Engine/Geometry/utils";
+import { GameMap, Orientation } from "@/Engine/GameMap";
 import { Player } from "@/Engine/Player";
+import { Direction } from "@/Engine/Geometry/Direction";
 
 type TileType = "base" | "teleporter";
 
@@ -13,8 +14,11 @@ export class Tile {
 
     }
 
+    can_go_through(direction: Direction) {
+        return this.solid === 0;
+    }
 
-    getNextPoint(map: GameMap, exploration: { v: Vector2, angle: number, distance: number, orientation: Orientation }, lines: Lines): boolean {
+    get_next_point(map: GameMap, exploration: { v: Vector2, angle: number, distance: number, orientation: Orientation }, lines: Lines): boolean {
         const x = exploration.v.x % 1;
         const y = exploration.v.y % 1;
         const angle = exploration.angle;
@@ -22,25 +26,25 @@ export class Tile {
         if (angle === 0) { //vers la droite
             exploration.v.x++;
             exploration.distance++;
-            exploration.orientation = Orientation.HORIZONTAL;
+            exploration.orientation = Orientation.VERTICAL;
             return true;
         }
         if (angle === Math.PI) { //vers la gauche
             exploration.v.x--;
             exploration.distance++;
-            exploration.orientation = Orientation.HORIZONTAL;
+            exploration.orientation = Orientation.VERTICAL;
             return true;
         }
         if (angle === Math.PI * 3 / 2) { //vers le haut
             exploration.v.y--;
             exploration.distance++;
-            exploration.orientation = Orientation.VERTICAL;
+            exploration.orientation = Orientation.HORIZONTAL;
             return true;
         }
         if (angle === Math.PI / 2) { //vers le bas
             exploration.v.y++;
             exploration.distance++;
-            exploration.orientation = Orientation.VERTICAL;
+            exploration.orientation = Orientation.HORIZONTAL;
             return true;
         }
 

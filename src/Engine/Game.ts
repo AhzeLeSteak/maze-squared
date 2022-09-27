@@ -1,8 +1,8 @@
-import {Player} from "@/Engine/Player";
-import {GameMap} from "@/Engine/GameMap";
-import {Controller} from "@/Engine/Controller";
-import {Canvas} from "@/Rendering/Abstract/Canvas";
-import {getAllTexture, textures} from "@/Engine/Texture/load_textures";
+import { Player } from "@/Engine/Player";
+import { GameMap } from "@/Engine/GameMap";
+import { Controller } from "@/Engine/Controller";
+import { Canvas } from "@/Rendering/Abstract/Canvas";
+import { getAllTexture, textures } from "@/Engine/Texture/load_textures";
 
 export class Game {
     public readonly player: Player;
@@ -17,7 +17,7 @@ export class Game {
         console.log("Instanciating Game class");
         this.controller = new Controller(this);
         this.map = new GameMap();
-        this.player = new Player(this.map.map_info.player_pos);
+        this.player = new Player(this.map.starting_pos);
     }
 
     init() {
@@ -46,7 +46,11 @@ export class Game {
 
 
     update(dt: number): void {
-        this.controller.update(dt);
-        this.player.update(this.map);
+        try {
+            this.controller.update(dt);
+            this.player.update(this.map);
+        } finally {
+
+        }
     }
 }

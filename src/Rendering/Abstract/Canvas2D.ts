@@ -1,5 +1,5 @@
 import { Canvas } from "@/Rendering/Abstract/Canvas";
-import { Vector2 } from "@/Engine/Vector2";
+import { Vector2 } from "@/Engine/Geometry/Vector2";
 
 export abstract class Canvas2D extends Canvas {
   protected contextd2D: CanvasRenderingContext2D;

@@ -1,4 +1,4 @@
-import { Vector2 } from "../../Engine/Vector2";
+import { Vector2 } from "../../Engine/Geometry/Vector2";
 import { Canvas } from "./Canvas";
 
 type Color = { r: number; g: number; b: number };

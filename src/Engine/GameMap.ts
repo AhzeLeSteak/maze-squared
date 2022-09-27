@@ -1,14 +1,8 @@
-import { Lines, Vector2 } from "./Vector2";
+import { Lines, Vector2 } from "./Geometry/Vector2";
 import { Tile, WALL } from "@/Engine/Tiles/Tile";
-import { two_pi } from "@/Engine/utils";
+import { angle_faces_down, angle_faces_left, two_pi } from "@/Engine/Geometry/utils";
 import { Teleporter } from "@/Engine/Tiles/Teleporter";
 
-export enum Direction { //dans l'ordre trigonométrique
-    RIGHT,
-    DOWN,
-    LEFT,
-    UP,
-}
 
 export enum Orientation {
     HORIZONTAL,
@@ -18,10 +12,9 @@ export enum Orientation {
 
 export class GameMap {
     // <editor-fold desc="Attributes and constructor">
-    map_info = {
-        boxes: [] as Array<Tile>,
-        player_pos: { x: 5, y: 5 } as Vector2
-    };
+    tiles = [] as Array<Tile>;
+    starting_pos = { x: 1, y: 1 } as Vector2;
+    ending_pos = { x: 8, y: 8 };
 
     size: Vector2 = {
         x: 10,
@@ -34,46 +27,36 @@ export class GameMap {
 
     // </editor-fold>
 
-    // <editor-fold desc="Box gestion">
-
-    get boxes(): Array<Tile> {
-        return this.map_info.boxes;
-    }
+    // <editor-fold desc="Tile gestion">
 
     public load(): void {
-        const array: number[] = new Array(this.size.x * this.size.y)
-            .fill(0)
-            .map((_, i) =>
-                i < this.size.x
-                || i > this.size.x * (this.size.y - 1)
-                || i % this.size.x === 0
-                || (i + 1) % this.size.x === 0
-                    ? 1 : 0);
-        array[this.size.x+1] = 2;
-        array[this.size.x*2+1] = 1;
-        array[array.length - this.size.x - 2] = 2;
-        array[array.length - this.size.x*2 - 2] = 1;
-        this.load_from_array(array);
+        this.tiles = new Array(this.size.x * this.size.y)
+          .fill(0)
+          .map((_, i) =>
+            i < this.size.x
+            || i > this.size.x * (this.size.y - 1)
+            || i % this.size.x === 0
+            || (i + 1) % this.size.x === 0
+              ? new Tile(1) : new Tile(0));
     }
 
-    public load_from_array(tile_as_numbers: number[]){
-        this.map_info.boxes = [];
-        const teleporters: {[key: number]: Teleporter} = {};
-        for(let n of tile_as_numbers){
-            if(n < 2)
-                this.map_info.boxes.push(new Tile(n));
-            else{
-                const tp_type = n-2;
-                const new_tp = new Teleporter(tp_type);
-                if(teleporters[tp_type]){
-                    new_tp.twin = teleporters[tp_type];
-                    teleporters[tp_type].twin = new_tp;
-                }
-                else
-                    teleporters[tp_type] = new_tp;
-                this.map_info.boxes.push(new_tp);
+    public load_from_serialized(options: { tiles: Tile[], size: Vector2, starting_pos: Vector2, ending_pos: Vector2 }) {
+        console.log(this);
+        this.tiles = [];
+        for (let tile of options.tiles) {
+            if (tile.tile_type === "base")
+                this.tiles.push(new Tile(tile.solid));
+            else {
+                const new_tp = new Teleporter();
+                new_tp.twin_index = (tile as Teleporter).twin_index;
+                new_tp.entrance = (tile as Teleporter).entrance;
+                this.tiles.push(new_tp);
             }
         }
+        this.size = options.size;
+        this.starting_pos = options.starting_pos;
+        this.ending_pos = options.ending_pos;
+        console.log(this);
     }
 
     vector_to_map_index(v: Vector2): number {
@@ -81,8 +64,8 @@ export class GameMap {
     }
 
     map_index_to_vector(i: number): Vector2 {
-        if(i < 0 || i > this.map_info.boxes.length)
-            throw new Error(i+' out of array bound');
+        if (i < 0 || i > this.tiles.length)
+            throw new Error(i + " out of array bound");
         return {
             x: i % this.size.x,
             y: Math.floor(i / this.size.x)
@@ -98,41 +81,45 @@ export class GameMap {
             if (can_oob) return WALL;
             throw new Error(`Out of bound : {x:${x}, y:${y}}`);
         }
-        return this.boxes[x + y * this.size.x];
+        return this.tiles[x + y * this.size.x];
     }
 
     isOutOfBound({ x, y }: Vector2): boolean {
         return x < 0 || y < 0 || x >= this.size.x || y >= this.size.y;
     }
 
-    setTile(v: Vector2, tile: Tile): void {
+    set_tile(v: Vector2, tile: Tile): void {
         const index = this.vector_to_map_index(v);
-        this.boxes[index] = tile;
+        this.tiles[index] = tile;
+    }
+
+    replace_tile(old_tile: Tile, new_tile: Tile) {
+        const pos = this.get_coords_of_tile(old_tile);
+        this.set_tile(pos, new_tile);
     }
 
     // </editor-fold>
 
     // <editor-fold desc="Map exploration">
     get_coords_of_tile(tile: Tile) {
-        return this.map_index_to_vector(this.boxes.findIndex(t => t === tile));
+        return this.map_index_to_vector(this.tiles.findIndex(t => t === tile));
     }
 
-    get_next_wall(v: Vector2, angle: number) {
+    get_next_wall(original_pos: Vector2, angle: number) {
         angle = (angle + two_pi) % two_pi;
-        v = { ...v };
-        const points: Lines = [{ ...v }];
-        let t = this.get_tile_from_side_coords(v, angle, true);
+        const points: Lines = [{ ...original_pos }];
+        let t = this.get_tile_from_side_coords(original_pos, angle, true);
         let end = false;
-        const exploration = { v, angle, distance: 0, orientation: Orientation.HORIZONTAL };
+        const exploration = { v: { ...original_pos }, angle, distance: 0, orientation: Orientation.HORIZONTAL };
         do {
-            if (t.getNextPoint(this, exploration, points))
+            if (t.get_next_point(this, exploration, points))
                 break;
             points.push({ ...exploration.v });
-            t = this.get_tile_from_side_coords(exploration.v, angle);
+            t = this.get_tile_from_side_coords(exploration.v, exploration.angle);
             end = t.solid === 1 || exploration.distance > 100;
         } while (!end);
 
-        const wallCol = (exploration.orientation === Orientation.HORIZONTAL ? v.x : v.y) % 1;
+        const wallCol = (exploration.orientation === Orientation.HORIZONTAL ? exploration.v.x : exploration.v.y) % 1;
 
 
         return { ...exploration, wallCol, points };
@@ -143,11 +130,11 @@ export class GameMap {
         const y_is_int = y === Math.floor(y);
 
         if (x_is_int) {
-            const face_left = angle >= Math.PI / 2 && angle <= Math.PI * 3 / 2;
-            return this.tile(x + (face_left ? -1 : 0), y, true);
+            const face_left = angle_faces_left(angle);
+            return this.tile(x + (face_left ? -1 : 0), y, true, true);
         } else if (y_is_int) {
-            const face_down = angle <= Math.PI;
-            return this.tile(x, y + (face_down ? 0 : -1), true);
+            const face_down = angle_faces_down(angle);
+            return this.tile(x, y + (face_down ? 0 : -1), true, true);
         }
         else if(initial)
             return this.tile(x, y, true, false);

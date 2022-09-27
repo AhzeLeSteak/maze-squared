@@ -14,14 +14,14 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from "vue";
-import {Game} from "@/Engine/Game";
-import {router} from "@/router/router";
+import { defineComponent } from "vue";
+import { Game } from "@/Engine/Game";
+import { router } from "@/router/router";
 
 export default defineComponent({
   name: "App",
-  data(){
-    return{
+  data() {
+    return {
       inited: false,
       game: new Game()
     };
@@ -38,11 +38,16 @@ export default defineComponent({
 </script>
 
 <style>
-.centered{
+.centered {
   position: fixed;
   top: 55vh;
   left: 50vw;
   transform: translate(-50%, -50%);
+  user-select: none; /* standard syntax */
+  -webkit-user-select: none; /* webkit (safari, chrome) browsers */
+  -moz-user-select: none; /* mozilla browsers */
+  -khtml-user-select: none; /* webkit (konqueror) browsers */
+  -ms-user-select: none; /* IE10+ */
 }
 
 #main-logo{

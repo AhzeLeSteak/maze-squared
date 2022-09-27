@@ -1,6 +1,6 @@
 import { AbstractTool } from "@/Engine/LevelEditor/AbstractTool";
 import { Game } from "@/Engine/Game";
-import { Vector2 } from "@/Engine/Vector2";
+import { Vector2 } from "@/Engine/Geometry/Vector2";
 import { Teleporter } from "@/Engine/Tiles/Teleporter";
 
 export class RotateTool extends AbstractTool {
