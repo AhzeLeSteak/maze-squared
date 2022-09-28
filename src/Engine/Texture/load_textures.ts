@@ -4,7 +4,7 @@ import { CanvasImage } from "@/Rendering/CanvasImage";
 const textures = new Map<string, Texture>();
 
 function getAllTexture() {
-  const textures_path = ["wall.png", "wall_2.png", "floor.png"];
+  const textures_path = ["wall.png", "wall_2.png", "floor.png", "floor_2.png"];
 
   const texture_name = (texture_path: string) => {
     const s1 = texture_path.split("/");

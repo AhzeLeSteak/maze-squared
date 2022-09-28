@@ -1,6 +1,6 @@
 import { Game } from "@/Engine/Game";
 import { Vector2 } from "@/Engine/Geometry/Vector2";
-import { degreToRadian, pi } from "@/Engine/Geometry/utils";
+import { degreToRadian, pi } from "@/Engine/Geometry/angles";
 import { Canvas2D } from "./Abstract/Canvas2D";
 import { Teleporter } from "@/Engine/Tiles/Teleporter";
 import { Orientation } from "@/Engine/GameMap";
@@ -86,7 +86,7 @@ export class CanvasTopView extends Canvas2D {
                     for (let i = 0; i < nextWall.points.length - 1; i++) {
                         const p1 = nextWall.points[i];
                         const p2 = nextWall.points[i + 1];
-                        if (!p2.stop)
+                        if (!p2.new_line)
                             this.drawLine(
                               p1.x * tile_size,
                               p1.y * tile_size,
@@ -105,7 +105,7 @@ export class CanvasTopView extends Canvas2D {
                 this.contextd2D.strokeStyle = i % 2 === 0 ? "cyan" : "darkred";
                 const p1 = points[i];
                 const p2 = points[i + 1];
-                if (!p2.stop)
+                if (!p2.new_line)
                     this.drawLine(
                       p1.x * tile_size,
                       p1.y * tile_size,

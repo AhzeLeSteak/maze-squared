@@ -2,7 +2,7 @@ import { Tile } from "@/Engine/Tiles/Tile";
 import { Lines, Vector2 } from "@/Engine/Geometry/Vector2";
 import { GameMap, Orientation } from "@/Engine/GameMap";
 import { Player } from "@/Engine/Player";
-import { angle_faces_down, angle_faces_left, correct_angle, pi_over_2 } from "@/Engine/Geometry/utils";
+import { angle_faces_down, angle_faces_left, correct_angle, pi_over_2 } from "@/Engine/Geometry/angles";
 import { Direction, opposite } from "@/Engine/Geometry/Direction";
 
 export enum TeleporterType {
@@ -78,7 +78,7 @@ export class Teleporter extends Tile {
             pos.x++;
         else if (direction === Direction.LEFT)
             pos.x--;
-        points?.push({ ...pos, stop: true });
+        points?.push({ ...pos, new_line: true });
     }
 
     rotate(map: GameMap, obj: { angle: number }, pos: Vector2, points ?: Lines) {
@@ -89,7 +89,7 @@ export class Teleporter extends Tile {
             rotate_point({ x: twin_coord.x + .5, y: twin_coord.y + .5 }, tp_angle, pos);
             obj.angle = correct_angle(obj.angle + tp_angle);
             points?.pop();
-            points?.push({ ...pos, stop: true });
+            points?.push({ ...pos, new_line: true });
         }
     }
 

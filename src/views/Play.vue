@@ -4,7 +4,6 @@
     <canvas id="play-canvas"
             class="centered"
             style="z-index: 10"
-            @mousemove="change_player_direction($event.movementX)"
     ></canvas>
   </div>
 

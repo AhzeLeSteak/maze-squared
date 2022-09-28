@@ -1,5 +1,5 @@
 import { Lines, Vector2 } from "@/Engine/Geometry/Vector2";
-import { correct_angle } from "@/Engine/Geometry/utils";
+import { correct_angle } from "@/Engine/Geometry/angles";
 import { GameMap, Orientation } from "@/Engine/GameMap";
 import { Player } from "@/Engine/Player";
 import { Direction } from "@/Engine/Geometry/Direction";

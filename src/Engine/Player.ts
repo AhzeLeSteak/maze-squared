@@ -1,5 +1,5 @@
 import { Vector2 } from "@/Engine/Geometry/Vector2";
-import { correct_angle, pi_over_2 } from "@/Engine/Geometry/utils";
+import { correct_angle, pi_over_2 } from "@/Engine/Geometry/angles";
 import { GameMap } from "@/Engine/GameMap";
 import { Direction } from "@/Engine/Geometry/Direction";
 

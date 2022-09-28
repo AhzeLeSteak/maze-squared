@@ -1,6 +1,6 @@
 import { Lines, Vector2 } from "./Geometry/Vector2";
 import { Tile, WALL } from "@/Engine/Tiles/Tile";
-import { angle_faces_down, angle_faces_left, two_pi } from "@/Engine/Geometry/utils";
+import { angle_faces_down, angle_faces_left, two_pi } from "@/Engine/Geometry/angles";
 import { Teleporter } from "@/Engine/Tiles/Teleporter";
 
 

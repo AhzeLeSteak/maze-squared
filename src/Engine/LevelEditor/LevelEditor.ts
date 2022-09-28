@@ -10,6 +10,7 @@ import { RotateTool } from "@/Engine/LevelEditor/RotateTool";
 import { EndingPosTool } from "@/Engine/LevelEditor/EndingPosTool";
 import { SaveTool } from "@/Engine/LevelEditor/SaveTool";
 import { LoadTool } from "@/Engine/LevelEditor/LoadTool";
+import { ExportTool } from "@/Engine/LevelEditor/ExportTool";
 
 export class LevelEditor {
 
@@ -29,7 +30,8 @@ export class LevelEditor {
             new StartingPosTool(),
             new EndingPosTool(),
             new SaveTool(),
-            new LoadTool()
+            new LoadTool(),
+            new ExportTool()
         ];
     }
 
@@ -38,7 +40,7 @@ export class LevelEditor {
             x: ev.offsetX,
             y: ev.offsetY
         });
-        if (change_tool){
+        if (change_tool) {
             this.AVAILABLE_TOOLS[this.tool_index].on_unselect(this.game);
             this.tool_index = 0;
         }
