@@ -1,13 +1,14 @@
 <template>
 
+  <div v-if="level_editor" class="toolbox">
+    <button v-for="(tool, index) of level_editor.AVAILABLE_TOOLS"
+            :style="tool_style(tool.texture_name, index)"
+            :title="tool.tooltip"
+            @click="level_editor.select(index)"
+    ></button>
+  </div>
+
   <div class="centered" style="display: flex">
-    <div v-if="level_editor" class="toolbox">
-      <button v-for="(tool, index) of level_editor.AVAILABLE_TOOLS"
-              :style="tool_style(tool.texture_name, index)"
-              :title="tool.tooltip"
-              @click="level_editor.select(index)"
-      ></button>
-    </div>
 
     <canvas id="top-view"
             @click="level_editor.click($event)"
@@ -31,10 +32,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { Game } from "@/Engine/Game";
-import { CanvasTopView } from "@/Rendering/CanvasTopView";
-import { LevelEditor } from "@/Engine/LevelEditor/LevelEditor";
+import {defineComponent, PropType} from "vue";
+import {Game} from "@/Engine/Game";
+import {CanvasTopView} from "@/Rendering/CanvasTopView";
+import {LevelEditor} from "@/Engine/LevelEditor/LevelEditor";
 
 
 export default defineComponent({
@@ -74,9 +75,13 @@ export default defineComponent({
 
 <style>
   .toolbox {
+    position: fixed;
+    left: 5vw;
+    top: 50vh;
+    transform: translateY(-50%);
     --size: 68px;
     display: grid;
-    grid-template: repeat(5, var(--size)) / repeat(2, var(--size));
+    grid-template: repeat(7, var(--size)) / repeat(2, var(--size));
     gap: 4px;
   }
 

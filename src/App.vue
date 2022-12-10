@@ -14,9 +14,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { Game } from "@/Engine/Game";
-import { router } from "@/router/router";
+import {defineComponent} from "vue";
+import {Game} from "@/Engine/Game";
+import {router} from "@/router/router";
 
 export default defineComponent({
   name: "App",
@@ -40,7 +40,7 @@ export default defineComponent({
 <style>
 .centered {
   position: fixed;
-  top: 55vh;
+  top: 50vh;
   left: 50vw;
   transform: translate(-50%, -50%);
   user-select: none; /* standard syntax */

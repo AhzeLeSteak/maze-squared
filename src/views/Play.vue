@@ -10,9 +10,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { Game } from "@/Engine/Game";
-import { CanvasRaycast } from "@/Rendering/CanvasRaycast";
+import {defineComponent, PropType} from "vue";
+import {Game} from "@/Engine/Game";
+import {CanvasRaycast} from "@/Rendering/CanvasRaycast";
 
 export default defineComponent({
   name: "Play",
@@ -23,16 +23,11 @@ export default defineComponent({
     }
   },
   mounted() {
-    this.game.start_loop(new CanvasRaycast(window.innerWidth * .8, window.innerHeight * .8, document.getElementById("play-canvas") as HTMLCanvasElement));
+    const ratio = .5;
+    this.game.start_loop(new CanvasRaycast(720 * ratio, 480 * ratio, document.getElementById("play-canvas") as HTMLCanvasElement));
   },
   unmounted() {
     this.game.stop();
-  },
-  methods: {
-    change_player_direction(dx: number) {
-      this.game.player.addAngle(dx / 500);
-
-    }
   }
 });
 </script>
@@ -40,5 +35,7 @@ export default defineComponent({
 <style>
 #play-canvas {
   cursor: none;
+  --scale: 3;
+  transform: scale(var(--scale)) translate(calc(1/var(--scale) * -50%), calc(1/var(--scale) * -50%));
 }
 </style>

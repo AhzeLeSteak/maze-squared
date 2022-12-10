@@ -1,24 +1,10 @@
-# maze-squared
+# Maze²
 
-## Project setup
-```
-npm install
-```
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## TODO
+- Augmenter/Réduire la taille de la map en hauteur et largeur
+- Pouvoir exporter/importer une carte (base64 ?)
+- enregistrer la map dans firebase
+- pouvoir lire une map firebase depuis une URL
+- Ajouter des portes s'ouvrant avec des boutons

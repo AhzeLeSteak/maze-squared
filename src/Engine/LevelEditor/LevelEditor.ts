@@ -1,16 +1,20 @@
-import { Game } from "@/Engine/Game";
-import { Vector2 } from "@/Engine/Geometry/Vector2";
-import { AbstractTool } from "@/Engine/LevelEditor/AbstractTool";
-import { WallFloorTool } from "@/Engine/LevelEditor/WallFloorTool";
-import { ResetTool } from "@/Engine/LevelEditor/ResetTool";
-import { StartingPosTool } from "@/Engine/LevelEditor/StartingPosTool";
-import { TeleporterTool } from "@/Engine/LevelEditor/TeleporterTool";
-import { CanvasTopView } from "@/Rendering/CanvasTopView";
-import { RotateTool } from "@/Engine/LevelEditor/RotateTool";
-import { EndingPosTool } from "@/Engine/LevelEditor/EndingPosTool";
-import { SaveTool } from "@/Engine/LevelEditor/SaveTool";
-import { LoadTool } from "@/Engine/LevelEditor/LoadTool";
-import { ExportTool } from "@/Engine/LevelEditor/ExportTool";
+import {Game} from "@/Engine/Game";
+import {Vector2} from "@/Engine/Geometry/Vector2";
+import {AbstractTool} from "@/Engine/LevelEditor/AbstractTool";
+import {WallFloorTool} from "@/Engine/LevelEditor/WallFloorTool";
+import {ResetTool} from "@/Engine/LevelEditor/ResetTool";
+import {StartingPosTool} from "@/Engine/LevelEditor/StartingPosTool";
+import {TeleporterTool} from "@/Engine/LevelEditor/TeleporterTool";
+import {CanvasTopView} from "@/Rendering/CanvasTopView";
+import {RotateTool} from "@/Engine/LevelEditor/RotateTool";
+import {EndingPosTool} from "@/Engine/LevelEditor/EndingPosTool";
+import {SaveTool} from "@/Engine/LevelEditor/SaveTool";
+import {LoadTool} from "@/Engine/LevelEditor/LoadTool";
+import {ExportTool} from "@/Engine/LevelEditor/ExportTool";
+import {MapWidthPlus} from "@/Engine/LevelEditor/MapWidthPlus";
+import {MapWidthMinus} from "@/Engine/LevelEditor/MapWidthMinus";
+import {MapHeightMinus} from "@/Engine/LevelEditor/MapHeightMinus";
+import {MapHeightPlus} from "@/Engine/LevelEditor/MapHeightPlus";
 
 export class LevelEditor {
 
@@ -31,6 +35,10 @@ export class LevelEditor {
             new EndingPosTool(),
             new SaveTool(),
             new LoadTool(),
+            new MapWidthPlus(),
+            new MapWidthMinus(),
+            new MapHeightPlus(),
+            new MapHeightMinus(),
             new ExportTool()
         ];
     }

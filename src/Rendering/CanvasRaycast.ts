@@ -1,10 +1,10 @@
-import { Game } from "@/Engine/Game";
-import { degreToRadian } from "@/Engine/Geometry/angles";
-import { textures } from "@/Engine/Texture/load_textures";
-import { Pixel } from "@/Engine/Texture/Texture";
-import { CanvasWebGL } from "./Abstract/CanvalWebGL";
-import { Orientation } from "@/Engine/GameMap";
-import { distance_vectors, Lines, Vector2 } from "@/Engine/Geometry/Vector2";
+import {Game} from "@/Engine/Game";
+import {degreToRadian} from "@/Engine/Geometry/angles";
+import {textures} from "@/Engine/Texture/load_textures";
+import {Pixel} from "@/Engine/Texture/Texture";
+import {CanvasWebGL} from "./Abstract/CanvalWebGL";
+import {Orientation} from "@/Engine/GameMap";
+import {distance_vectors, Lines, Vector2} from "@/Engine/Geometry/Vector2";
 
 
 const SAMPLE_SIZE = 10;
@@ -33,8 +33,8 @@ export class CanvasRaycast extends CanvasWebGL {
         const map = game.map;
         const player_pos = game.player.pos;
 
-        const col_size = 16; //numbers of columns grouped for rendering
-        const col_size_floors = 16;
+        const col_size = 2; //numbers of columns grouped for rendering
+        const col_size_floors = col_size;
 
         let prev_dist = 0;
 
@@ -106,7 +106,7 @@ export class CanvasRaycast extends CanvasWebGL {
                         this.setColor(color.r / 255, color.g / 255, color.b / 255);
                         color = nColor;
                         this.drawRectangle(base_x, last_draw_y, col_size_floors, y - last_draw_y);
-                        //this.drawRectangle(base_x, this.size.y - last_draw_y, col_size_floors, this.size.y - y - last_draw_y);
+                        this.drawRectangle(base_x, this.size.y - last_draw_y, col_size_floors, this.size.y - y - last_draw_y);
                         last_draw_y = y;
                     }
                 }

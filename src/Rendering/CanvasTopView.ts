@@ -1,11 +1,11 @@
-import { Game } from "@/Engine/Game";
-import { Vector2 } from "@/Engine/Geometry/Vector2";
-import { degreToRadian, pi } from "@/Engine/Geometry/angles";
-import { Canvas2D } from "./Abstract/Canvas2D";
-import { Teleporter } from "@/Engine/Tiles/Teleporter";
-import { Orientation } from "@/Engine/GameMap";
-import { Direction } from "@/Engine/Geometry/Direction";
-import { WALL } from "@/Engine/Tiles/Tile";
+import {Game} from "@/Engine/Game";
+import {Vector2} from "@/Engine/Geometry/Vector2";
+import {degreToRadian, pi} from "@/Engine/Geometry/angles";
+import {Canvas2D} from "./Abstract/Canvas2D";
+import {Teleporter} from "@/Engine/Tiles/Teleporter";
+import {Orientation} from "@/Engine/GameMap";
+import {Direction} from "@/Engine/Geometry/Direction";
+import {WALL} from "@/Engine/Tiles/Tile";
 
 export class CanvasTopView extends Canvas2D {
 
@@ -15,13 +15,18 @@ export class CanvasTopView extends Canvas2D {
 
     constructor(game: Game, public readonly tile_size: number, canvas ?: HTMLCanvasElement) {
         super({
-            x: game.map.size.y * tile_size,
+            x: game.map.size.x * tile_size,
             y: game.map.size.y * tile_size,
         }, canvas);
         this.last_player_pos = { x: Infinity, y: Infinity };
     }
 
     drawContext(game: Game): void {
+        this.size = {
+            x: game.map.size.x * this.tile_size,
+            y: game.map.size.y * this.tile_size,
+        }
+        this.resizeCanvasHtml(this.canvas, this.size);
         this.reset();
         const tile_size = this.tile_size;
 

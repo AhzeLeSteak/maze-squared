@@ -1,10 +1,10 @@
-import { AbstractTool } from "@/Engine/LevelEditor/AbstractTool";
-import { Game } from "@/Engine/Game";
+import {AbstractTool} from "@/Engine/LevelEditor/AbstractTool";
+import {Game} from "@/Engine/Game";
 
 export class LoadTool extends AbstractTool {
 
   constructor() {
-    super("load", "Load level", false);
+    super("load", "Load level locally", false);
   }
 
   on_select(game: Game) {
