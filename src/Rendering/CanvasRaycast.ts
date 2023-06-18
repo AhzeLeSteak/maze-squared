@@ -2,7 +2,7 @@ import {Game} from "@/Engine/Game";
 import {degreToRadian} from "@/Engine/Geometry/angles";
 import {textures} from "@/Engine/Texture/load_textures";
 import {Pixel} from "@/Engine/Texture/Texture";
-import {CanvasWebGL} from "./Abstract/CanvalWebGL";
+import {CanvasWebGL} from "./Abstract/CanvasWebGL";
 import {Orientation} from "@/Engine/GameMap";
 import {distance_vectors, Lines, Vector2} from "@/Engine/Geometry/Vector2";
 
@@ -19,7 +19,7 @@ export class CanvasRaycast extends CanvasWebGL {
     constructor(width: number, height: number, canvas: HTMLCanvasElement) {
         super({ x: width, y: height }, canvas);
         this.context2D = this.createCanvas().getContext("2d")!;
-        this.resizeCanvasHtml(this.context2D.canvas, this.size);
+        this.resizeCanvasHtml(this.context2D.canvas, {x: this.canvas.width*3, y: this.canvas.height*3});
         this.context2D.font = "16px Comic sans";
         this.context2D.fillStyle = "yellow";
     }
@@ -78,6 +78,7 @@ export class CanvasRaycast extends CanvasWebGL {
                 // for(let x = base_x; x < base_x + col_size; x++){
                 // 	this.drawHorizontalLine(x, y1, y1+dy);
                 // }
+
                 this.drawRectangle(base_x, y1, col_size, dy);
                 tile_y += tile_y_step;
             }
@@ -112,6 +113,8 @@ export class CanvasRaycast extends CanvasWebGL {
                 }
             prev_dist = dist;
         }
+
+        this.drawFps(dt);
         this.finishDrawing();
     }
 
@@ -150,6 +153,6 @@ export class CanvasRaycast extends CanvasWebGL {
 
         const fps = SAMPLE_SIZE / tick_sum;
         this.context2D.clearRect(0, 0, this.size.x, this.size.y);
-        this.context2D.fillText(fps.toFixed(2), this.size.x - 40, 15);
+        this.context2D.fillText(fps.toFixed(2), 10, 15);
     }
 }

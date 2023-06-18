@@ -16,6 +16,8 @@ export abstract class Canvas {
 
     protected abstract reset(): void;
 
+    public async init(){}
+
     protected resizeCanvasHtml(canvas: HTMLCanvasElement, size: Vector2){
         canvas.setAttribute("width", size.x + "");
         canvas.setAttribute("height", size.y + "");

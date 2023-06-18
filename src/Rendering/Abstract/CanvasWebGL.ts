@@ -1,4 +1,4 @@
-import { Vector2 } from "../../Engine/Geometry/Vector2";
+import { Vector2 } from "@/Engine/Geometry/Vector2";
 import { Canvas } from "./Canvas";
 
 type Color = { r: number; g: number; b: number };
@@ -14,34 +14,14 @@ export abstract class CanvasWebGL extends Canvas {
   protected constructor(size: Vector2, canvas: HTMLCanvasElement) {
     super(size, canvas);
     this.gl = this.canvas.getContext("webgl2")!;
-    this.setupWebGl();
     this.reset();
   }
 
-  private setupWebGl() {
+  override async init() {
     const gl = this.gl;
-    const vertexShaderSource = `#version 300 es
 
-    in vec2 a_Position;
-    in vec3 a_Color;
-    out vec3 v_Color;
-
-    void main()
-    {
-        gl_Position = vec4(a_Position, 0.0, 1.0);
-        v_Color = a_Color;
-    }`;
-
-    const fragmentShaderSource = `#version 300 es
-
-    precision mediump float;
-    in vec3 v_Color;
-    out vec4 fragColor;
-
-    void main()
-    {
-        fragColor = vec4(v_Color, 1.0);
-    }`;
+    const vertexShaderSource = await fetch('assets/shaders/vertex.glsl').then(res => res.text());
+    const fragmentShaderSource = await fetch('assets/shaders/fragment.glsl').then(res => res.text());
 
     const vShader = gl.createShader(gl.VERTEX_SHADER);
     if (!vShader) throw new Error("Imposibble de créer le vertex shader");

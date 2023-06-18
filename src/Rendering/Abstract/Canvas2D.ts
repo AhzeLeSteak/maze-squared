@@ -27,8 +27,7 @@ export abstract class Canvas2D extends Canvas {
   }
 
   protected reset(): void {
-    this.contextd2D.fillStyle = "white";
-    this.drawSquare(0, 0, this.size.x, this.size.y);
+    this.contextd2D.clearRect(0, 0, this.size.x, this.size.y);
   }
 
   protected setColor(red: number, green: number, blue: number): void {

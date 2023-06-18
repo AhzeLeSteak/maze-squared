@@ -3,7 +3,6 @@
   <div id="canvas-container">
     <canvas id="play-canvas"
             class="centered"
-            style="z-index: 10"
     ></canvas>
   </div>
 
