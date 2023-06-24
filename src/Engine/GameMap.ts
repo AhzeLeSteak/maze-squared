@@ -9,11 +9,20 @@ export enum Orientation {
     VERTICAL
 }
 
+export type Wall = {
+    wallCol: number,
+    points: Lines,
+    v: { x: number, y: number },
+    angle: number,
+    distance: number,
+    orientation: Orientation
+};
+
 
 export class GameMap {
     // <editor-fold desc="Attributes and constructor">
     tiles = [] as Array<Tile>;
-    starting_pos = { x: 1, y: 1 } as Vector2;
+    starting_pos = { x: 4, y: 4 } as Vector2;
     ending_pos = { x: 8, y: 8 };
 
     size: Vector2 = {
@@ -105,7 +114,7 @@ export class GameMap {
         return this.map_index_to_vector(this.tiles.findIndex(t => t === tile));
     }
 
-    get_next_wall(original_pos: Vector2, angle: number) {
+    get_next_wall(original_pos: Vector2, angle: number): Wall {
         angle = (angle + two_pi) % two_pi;
         const points: Lines = [{ ...original_pos }];
         let t = this.get_tile_from_side_coords(original_pos, angle, true);

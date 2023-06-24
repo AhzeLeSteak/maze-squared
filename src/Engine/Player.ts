@@ -7,7 +7,7 @@ export class Player {
   /**
    * Angle en radian
    */
-  public angle = pi_over_2 + 0.1;
+  public angle = pi_over_2 + 0.3;
   public readonly speed = 2; //tile per second
   public readonly rotation_speed = 120; // deg per second
 

@@ -1,4 +1,4 @@
-import { Pixel, Texture } from "@/Engine/Texture/Texture";
+import { Color, Texture } from "@/Engine/Texture/Texture";
 import { Canvas2D } from "./Abstract/Canvas2D";
 import { Game } from "@/Engine/Game";
 
@@ -6,10 +6,11 @@ export class CanvasImage extends Canvas2D {
   constructor(image: HTMLImageElement) {
     super({ x: image.width, y: image.height });
     this.contextd2D.drawImage(image, 0, 0);
+    this.canvas.setAttribute("willReadFrequently", "true");
   }
 
   getTexture(): Texture {
-    const array: Array<Pixel> = [];
+    const array: Array<Color> = [];
     for (let y = 0; y < this.size.y; y++) {
       for (let x = 0; x < this.size.x; x++) {
         const data = this.contextd2D.getImageData(x, y, 1, 1).data;
@@ -29,6 +30,5 @@ export class CanvasImage extends Canvas2D {
   }
 
   drawContext(context: Game, dt: number): void {
-    console.log("image");
   }
 }

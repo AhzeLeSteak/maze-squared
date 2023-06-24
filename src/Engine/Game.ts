@@ -28,7 +28,6 @@ export class Game {
     }
 
     async start_loop(renderer: Canvas) {
-        await renderer.init();
         let last = 0;
         const loop = (c: DOMHighResTimeStamp) => {
             const delta = (c - last)/1000;
