@@ -14,7 +14,7 @@ export abstract class CanvasWebGLTest extends Canvas {
   private palette_indexes: number[] = [];
   private line_heights: number[] = [];
   private offset = 0;
-  private col_group = 80;
+  private col_group = 6;
   private total_height = 0;
 
   private uniform_locations = {
@@ -59,7 +59,7 @@ export abstract class CanvasWebGLTest extends Canvas {
 
   protected drawHorizontalLine(length: number): void {
     this.total_height += length;
-    let palette_id = this.palette.findIndex(c => distance(c, this.color) < 25);
+    let palette_id = this.palette.findIndex(c => distance(c, this.color) < 10);
 
     //if last draw was same color, juste add length to last length
     if (this.palette_indexes.length && this.palette_indexes[this.palette_indexes.length - 1] === palette_id) {

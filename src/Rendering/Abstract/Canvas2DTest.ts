@@ -1,7 +1,7 @@
 import { Canvas } from "@/Rendering/Abstract/Canvas";
 import { Vector2 } from "@/Engine/Geometry/Vector2";
 
-export abstract class Canvas2D extends Canvas {
+export abstract class Canvas2DTest extends Canvas {
   x = 0;
   y = 0;
   protected contextd2D: CanvasRenderingContext2D;
@@ -30,6 +30,10 @@ export abstract class Canvas2D extends Canvas {
       this.x++;
       this.y = 0;
     }
+  }
+
+  newColumn(){
+
   }
 
   public finishDrawing() {

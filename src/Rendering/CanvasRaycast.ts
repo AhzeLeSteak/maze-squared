@@ -5,6 +5,7 @@ import { Color, distance, Texture } from "@/Engine/Texture/Texture";
 import { Orientation, Wall } from "@/Engine/GameMap";
 import { distance_vectors, Lines, Vector2 } from "@/Engine/Geometry/Vector2";
 import { CanvasWebGLTest } from "@/Rendering/Abstract/CanvasWebGLTest";
+import {Canvas2DTest} from "@/Rendering/Abstract/Canvas2DTest";
 
 const SAMPLE_SIZE = 10;
 let tick_index = 0;
@@ -33,7 +34,6 @@ export class CanvasRaycast extends CanvasWebGLTest {
       //const col_size = 2; //numbers of columns grouped for rendering
       //const col_size_floors = col_size;
 
-      let prev_dist = 0;
 
       for (let base_x = 0; base_x < this.size.x; base_x += 1) {
         const ray_diff_angle = (((base_x - this.size.x / 2) * game.view_angle) / this.size.x) * degreToRadian;
@@ -55,7 +55,6 @@ export class CanvasRaycast extends CanvasWebGLTest {
         this.drawWalls(lineHeight, next_wall, t);
         this.drawFloor(base_y, lineHeight, ray_diff_angle, base_x, next_wall);
 
-        prev_dist = dist;
         this.newColumn();
       }
 
@@ -94,18 +93,19 @@ export class CanvasRaycast extends CanvasWebGLTest {
 
   drawCeiling(base_y: number, lineHeight: number, ray_diff_angle: number, base_x: number, next_wall: Wall) {
     if (lineHeight === this.size.y) return;
-    this.setColor(0, 0, 0);
-    this.drawHorizontalLine(Math.floor((this.size.y - lineHeight) / 2));
-    return;
-
+    if(false){
+        this.setColor(0, 0, 0);
+        this.drawHorizontalLine(base_y);
+        return;
+    }
     //draw floor and ceiling
     let color: Color = { r: 0, g: 0, b: 0 };
     let last_draw_y = 0;
 
     const raFix = Math.cos(ray_diff_angle);
 
-    for (let y = 0; y <= (this.size.y - lineHeight) / 2; y++) {
-      const dy = y / this.size.y - 0.5;
+    for (let y = 0; y <= base_y; y++) {
+      const dy = (this.size.y - y) / this.size.y - 0.5;
       const floor_dist = 1 / (dy * 2);
 
       // let tx = player_pos.x + floor_dist * coeff_x;
@@ -117,7 +117,7 @@ export class CanvasRaycast extends CanvasWebGLTest {
       ty = Math.floor(ty * floor_tile_size);
 
       const nColor = floor_text.columns[tx & (floor_tile_size - 1)][ty & (floor_tile_size - 1)];
-      if (distance(nColor, color) > 20 || y === this.size.y) {
+      if (distance(nColor, color) > 20 || y === base_y) {
         this.setColor(color.r / 255, color.g / 255, color.b / 255);
         color = nColor;
         //this.drawRectangle(base_x, this.size.y - last_draw_y, col_size_floors, this.size.y - y - last_draw_y);
@@ -129,40 +129,40 @@ export class CanvasRaycast extends CanvasWebGLTest {
   }
 
   drawFloor(base_y: number, lineHeight: number, ray_diff_angle: number, base_x: number, next_wall: Wall) {
-    if (lineHeight === this.size.y) return;
-    this.setColor(0, 0, 0);
-    this.drawHorizontalLine(Math.floor((this.size.y - lineHeight) / 2));
-    return;
-
-    //draw floor and ceiling
-    let color: Color = { r: 0, g: 0, b: 0 };
-    let last_draw_y = base_y + lineHeight - 1;
-
-    const raFix = Math.cos(ray_diff_angle);
-
-    for (let y = last_draw_y; y <= this.size.y; y++) {
-      const dy = y / this.size.y - 0.5;
-      const floor_dist = 1 / (dy * 2);
-
-      // let tx = player_pos.x + floor_dist * coeff_x;
-      //let ty = player_pos.y + floor_dist * coeff_y;
-      let { x: tx, y: ty } = this.get_coords_from_lines(floor_dist / raFix, next_wall.points);
-      const floor_text = textures.get(Math.floor(tx) % 2 === 0 ? "floor" : "floor_2")!;
-      const floor_tile_size = floor_text.columns[0].length;
-      tx = Math.floor(tx * floor_tile_size);
-      ty = Math.floor(ty * floor_tile_size);
-
-      const nColor = floor_text.columns[tx & (floor_tile_size - 1)][ty & (floor_tile_size - 1)];
-      if (distance(nColor, color) > 20 || y === this.size.y) {
-        this.setColor(color.r / 255, color.g / 255, color.b / 255);
-        color = nColor;
-
-        //this.drawRectangle(base_x, last_draw_y, col_size_floors, y - last_draw_y);
-        this.drawHorizontalLine(y - last_draw_y);
-
-        last_draw_y = y;
+      if (lineHeight === this.size.y) return;
+      if(false){
+          this.setColor(0, 0, 0);
+          this.drawHorizontalLine(base_y);
+          return;
       }
-    }
+      //draw floor and ceiling
+      let color: Color = { r: 0, g: 0, b: 0 };
+      let last_draw_y = base_y + lineHeight;
+
+      const raFix = Math.cos(ray_diff_angle);
+
+      for (let y = base_y + lineHeight; y <= this.size.y; y++) {
+          const dy = y / this.size.y - 0.5;
+          const floor_dist = 1 / (dy * 2);
+
+          // let tx = player_pos.x + floor_dist * coeff_x;
+          //let ty = player_pos.y + floor_dist * coeff_y;
+          let { x: tx, y: ty } = this.get_coords_from_lines(floor_dist / raFix, next_wall.points);
+          const floor_text = textures.get(Math.floor(tx) % 2 === 0 ? "floor" : "floor_2")!;
+          const floor_tile_size = floor_text.columns[0].length;
+          tx = Math.floor(tx * floor_tile_size);
+          ty = Math.floor(ty * floor_tile_size);
+
+          const nColor = floor_text.columns[tx & (floor_tile_size - 1)][ty & (floor_tile_size - 1)];
+          if (distance(nColor, color) > 20 || y === this.size.y) {
+              this.setColor(color.r / 255, color.g / 255, color.b / 255);
+              color = nColor;
+              //this.drawRectangle(base_x, this.size.y - last_draw_y, col_size_floors, this.size.y - y - last_draw_y);
+              this.drawHorizontalLine(y - last_draw_y);
+
+              last_draw_y = y;
+          }
+      }
     }
 
 

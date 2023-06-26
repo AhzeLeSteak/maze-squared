@@ -2,8 +2,8 @@ export const fragmentShader = `
 
 precision mediump float;
 
-#define MAX_PALETTE_COUNT 100
-#define MAX_LINE_COUNT 420
+#define MAX_PALETTE_COUNT 20
+#define MAX_LINE_COUNT 300
 
 uniform vec3 palette[MAX_PALETTE_COUNT];
 uniform int palette_indexes[MAX_LINE_COUNT];
