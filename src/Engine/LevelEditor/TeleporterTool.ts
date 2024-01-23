@@ -11,7 +11,7 @@ export class TeleporterTool extends AbstractTool {
     first_tp_tile ?: Teleporter;
 
     constructor(private canvas: CanvasTopView) {
-        super(`tp`, "Put teleporting tile");
+        super(`tp`, "Put two teleporting tiles");
     }
 
     on_select(game: Game) {

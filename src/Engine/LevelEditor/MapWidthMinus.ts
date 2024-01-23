@@ -5,7 +5,7 @@ import '../../utils/array.extension';
 export class MapWidthMinus extends AbstractTool {
 
     constructor() {
-        super("w-", "Decrease map height", false);
+        super("w-", "Decrease map width", false);
     }
 
     on_select(game: Game) {

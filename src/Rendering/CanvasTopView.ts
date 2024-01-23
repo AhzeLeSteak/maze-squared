@@ -164,7 +164,7 @@ export class CanvasTopView extends Canvas2D {
 
 
         //surbrillance de la case où se situe le curseur
-        if(this.tile_pos_hovered) {
+        if(this.tile_pos_hovered && !map.isOutOfBound(this.tile_pos_hovered)) {
             const x = Math.floor(this.tile_pos_hovered.x) * tile_size;
             const y = Math.floor(this.tile_pos_hovered.y) * tile_size;
 

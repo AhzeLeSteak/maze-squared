@@ -55,14 +55,14 @@ export class Teleporter extends Tile {
             return true;
 
         this.teleport(map, exploration.v, direction, points);
-        this.rotate(map, exploration, exploration.v, points);
+        this.rotateObject(map, exploration, exploration.v, points);
         return super.get_next_point(map, exploration, points);
     }
 
     on_walk(map: GameMap, player: Player, walk_direction: Direction) {
         super.on_walk(map, player, walk_direction);
         this.teleport(map, player.pos, walk_direction);
-        this.rotate(map, player, player.pos);
+        this.rotateObject(map, player, player.pos);
     }
 
     teleport(map: GameMap, pos: Vector2, direction: Direction, points ?: Lines) {
@@ -81,7 +81,11 @@ export class Teleporter extends Tile {
         points?.push({ ...pos, new_line: true });
     }
 
-    rotate(map: GameMap, obj: { angle: number }, pos: Vector2, points ?: Lines) {
+    public rotate(diff = 1){
+        this.entrance = (this.entrance + diff) % 4;
+    }
+
+    private rotateObject(map: GameMap, obj: { angle: number }, pos: Vector2, points ?: Lines) {
         const nb_rotation = ((2 + this.twin(map).entrance - this.entrance) % 4);
         if (nb_rotation !== 0) {
             const tp_angle = pi_over_2 * nb_rotation;

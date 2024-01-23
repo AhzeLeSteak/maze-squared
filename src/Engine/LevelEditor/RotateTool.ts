@@ -14,6 +14,6 @@ export class RotateTool extends AbstractTool {
         if (tile.tile_type !== "teleporter")
             return;
         const tp = tile as Teleporter;
-        tp.entrance = (tp.entrance + 1) % 4;
+        tp.rotate();
     }
 }

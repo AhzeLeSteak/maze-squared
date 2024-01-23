@@ -20,11 +20,10 @@ export class Game {
         this.player = new Player(this.map.starting_pos);
     }
 
-    init() {
+    async init() {
         console.log("Waiting for textures to load");
-        return getAllTexture().then(() => {
-            console.log("Textures loaded", textures);
-        });
+        await getAllTexture();
+        console.log("Textures loaded", textures);
     }
 
     async start_loop(renderer: Canvas) {

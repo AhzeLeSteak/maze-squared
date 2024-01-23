@@ -23,7 +23,7 @@ export class GameMap {
     // <editor-fold desc="Attributes and constructor">
     tiles = [] as Array<Tile>;
     starting_pos = { x: 4, y: 4 } as Vector2;
-    ending_pos = { x: 8, y: 8 };
+    ending_pos = { x: 1, y: 8 };
 
     size: Vector2 = {
         x: 10,
@@ -31,14 +31,14 @@ export class GameMap {
     };
 
     constructor() {
-        this.load();
+        this.load(true);
     }
 
     // </editor-fold>
 
     // <editor-fold desc="Tile gestion">
 
-    public load(): void {
+    public load(addTP = false): void {
         this.tiles = new Array(this.size.x * this.size.y)
           .fill(0)
           .map((_, i) =>
@@ -47,6 +47,24 @@ export class GameMap {
             || i % this.size.x === 0
             || (i + 1) % this.size.x === 0
               ? new Tile(1) : new Tile(0));
+
+        if(!addTP) return;
+
+        const tp1 = new Teleporter();
+        const pos1: Vector2 = {x: 8, y: 5};
+        this.set_tile(pos1, tp1);
+        const tp2 = new Teleporter();
+        const pos2: Vector2 = {x: 8, y: 8};
+        this.set_tile(pos2, tp2);
+        tp1.twin_index = this.vector_to_map_index(pos2);
+        tp2.twin_index = this.vector_to_map_index(pos1);
+        tp2.rotate(2)
+
+        this.set_tile({x: pos1.x-1, y: pos1.y}, new Tile(1));
+        this.set_tile({x: pos1.x-1, y: pos1.y-1}, new Tile(1));
+        this.set_tile({x: pos1.x-1, y: pos1.y+1}, new Tile(1));
+        this.set_tile({x: pos1.x, y: pos1.y-1}, new Tile(1));
+        this.set_tile({x: pos2.x-1, y:pos2.y}, new Tile(1));
     }
 
     public load_from_serialized(options: { tiles: Tile[], size: Vector2, starting_pos: Vector2, ending_pos: Vector2 }) {
