@@ -1,0 +1,1 @@
+.toolbox{position:fixed;left:5vw;top:50vh;transform:translateY(-50%);--size:68px;display:grid;grid-template:repeat(7,var(--size)) /repeat(2,var(--size));gap:4px}.toolbox button{background-size:64px;padding:0;image-rendering:pixelated}#top-view{margin-left:64px}

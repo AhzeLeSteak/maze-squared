@@ -1,1 +1,0 @@
-.toolbox{--size:68px;display:grid;grid-template:repeat(5,var(--size)) /repeat(1,var(--size))}.toolbox button{background-size:64px;padding:0;image-rendering:pixelated}#top-view{margin-left:64px}
