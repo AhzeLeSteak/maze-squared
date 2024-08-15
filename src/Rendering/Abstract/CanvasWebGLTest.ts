@@ -14,7 +14,7 @@ export abstract class CanvasWebGLTest extends Canvas {
   private palette_indexes: number[] = [];
   private line_heights: number[] = [];
   private offset = 0;
-  private col_group = 6;
+  private col_group = 3;
   private total_height = 0;
 
   private uniform_locations = {

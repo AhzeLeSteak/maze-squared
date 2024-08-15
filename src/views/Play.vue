@@ -22,7 +22,7 @@ export default defineComponent({
     }
   },
   mounted() {
-    const ratio = .5;
+    const ratio = 1;
     this.game.start_loop(new CanvasRaycast(720 * ratio, 480 * ratio, document.getElementById("play-canvas") as HTMLCanvasElement));
   },
   unmounted() {
@@ -34,7 +34,5 @@ export default defineComponent({
 <style>
 #play-canvas {
   cursor: none;
-  --scale: 3;
-  transform: scale(var(--scale)) translate(calc(1/var(--scale) * -50%), calc(1/var(--scale) * -50%));
 }
 </style>

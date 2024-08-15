@@ -61,6 +61,8 @@ export class LevelEditor {
 
     mouse_move(ev: MouseEvent) {
         this.canvas.tile_pos_hovered = this.getPos(ev);
+        if(this.game.map.isOutOfBound(this.canvas.tile_pos_hovered))
+            this.canvas.tile_pos_hovered = undefined;
         if (this.dragging >= 0 && this.tool_index === 0) {
             this.dragging === 0 ? this.click(ev) : this.context_menu(ev);
         }
