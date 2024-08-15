@@ -39,7 +39,7 @@ export class LevelEditor {
             new MapWidthMinus(),
             new MapHeightPlus(),
             new MapHeightMinus(),
-            new ExportTool()
+            //new ExportTool()
         ];
     }
 

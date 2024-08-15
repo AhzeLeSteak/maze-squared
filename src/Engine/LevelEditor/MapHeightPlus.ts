@@ -6,7 +6,7 @@ import {Tile} from "@/Engine/Tiles/Tile";
 export class MapHeightPlus extends AbstractTool {
 
     constructor() {
-        super("h+", "Increse map height", false);
+        super("h+", "Increase map height", false);
     }
 
     on_select(game: Game) {
