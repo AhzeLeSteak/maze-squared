@@ -1,7 +1,5 @@
 import { Vector2 } from "@/Engine/Geometry/Vector2";
 import { Canvas } from "./Canvas";
-import { vertexShader } from "@/Rendering/shaders/vertex";
-import { fragmentShader } from "@/Rendering/shaders/fragment";
 import { Color, distance } from "@/Engine/Texture/Texture";
 
 
@@ -37,7 +35,6 @@ export abstract class CanvasWebGLTest extends Canvas {
     super(size, canvas);
     this.gl = this.canvas.getContext("webgl2")!;
     this.reset();
-    this.create_program();
   }
 
   public newColumn() {
@@ -98,17 +95,19 @@ export abstract class CanvasWebGLTest extends Canvas {
     //gl.drawArrays(gl.LINES, 0, verticesAndColors.length / 5);
   }
 
-  private create_program() {
+  public async init() {
     const gl = this.gl;
     if (!this.gl)
       throw new Error("WebGL environment could not be created");
     const vShader = gl.createShader(gl.VERTEX_SHADER);
     if (!vShader) throw new Error("Imposibble de créer le vertex shader");
+    const vertexShader = await fetch('assets/shaders/vertex.glsl').then(response => response.text());
     gl.shaderSource(vShader, vertexShader);
     gl.compileShader(vShader);
 
     const fShader = gl.createShader(gl.FRAGMENT_SHADER);
     if (!fShader) throw new Error("Imposibble de créer le fragment shader");
+    const fragmentShader = await fetch('assets/shaders/fragment.glsl').then(response => response.text());
     gl.shaderSource(fShader, fragmentShader);
     gl.compileShader(fShader);
 

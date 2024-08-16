@@ -1,5 +1,3 @@
-export const vertexShader = `
-
 precision mediump float;
 
 uniform int offset;
@@ -21,5 +19,3 @@ void main() {
     if(vertexId == 3.0)
         gl_Position = vec4(right, -1, 0, 1);
 }
-
-`;
