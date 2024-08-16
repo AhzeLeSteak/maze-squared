@@ -1,10 +1,12 @@
+#version 300 es
+
 precision mediump float;
 
-uniform int offset;
-uniform int col_group;
+uniform uint offset;
+uniform uint col_group;
 uniform vec2 resolution;
 
-attribute float vertexId;
+in float vertexId;
 
 void main() {
     float left  = 2.0 * float(offset) / resolution.x - 1.0;

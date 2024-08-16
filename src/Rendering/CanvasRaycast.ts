@@ -85,7 +85,7 @@ export class CanvasRaycast extends CanvasWebGLTest {
         this.setColor(color.r / 255, color.g / 255, color.b / 255);
         color = new_color;
         //this.drawRectangle(base_x, last_draw_y, col_size_floors, y - last_draw_y);
-        this.drawHorizontalLine(y - last_draw_y);
+        this.drawVerticalLine(y - last_draw_y);
         last_draw_y = y;
       }
     }
@@ -116,7 +116,7 @@ export class CanvasRaycast extends CanvasWebGLTest {
         this.setColor(color.r / 255, color.g / 255, color.b / 255);
         color = nColor;
         //this.drawRectangle(base_x, this.size.y - last_draw_y, col_size_floors, this.size.y - y - last_draw_y);
-        this.drawHorizontalLine(y - last_draw_y);
+        this.drawVerticalLine(y - last_draw_y);
         
         last_draw_y = y;
       }
@@ -125,6 +125,8 @@ export class CanvasRaycast extends CanvasWebGLTest {
   
   drawFloor(base_y: number, lineHeight: number, ray_diff_angle: number, base_x: number, next_wall: Wall) {
     if (lineHeight >= this.size.y) return;
+    //this.setColor(255, 255, 255);
+    //return this.drawVerticalLine(Math.floor((this.size.y - lineHeight) / 2));
     //draw floor and ceiling
     let color: Color = { r: 0, g: 0, b: 0 };
     let last_draw_y = base_y + lineHeight;
@@ -148,7 +150,7 @@ export class CanvasRaycast extends CanvasWebGLTest {
         this.setColor(color.r / 255, color.g / 255, color.b / 255);
         color = nColor;
         //this.drawRectangle(base_x, this.size.y - last_draw_y, col_size_floors, this.size.y - y - last_draw_y);
-        this.drawHorizontalLine(y - last_draw_y);
+        this.drawVerticalLine(y - last_draw_y);
         
         last_draw_y = y;
       }
@@ -191,5 +193,7 @@ export class CanvasRaycast extends CanvasWebGLTest {
     const fps = SAMPLE_SIZE / tick_sum;
     this.context2D.clearRect(0, 0, this.size.x, this.size.y);
     this.context2D.fillText(fps.toFixed(2), 10, 20);
+    this.context2D.fillText(this.line_array_length.toString(), 10, 50);
+    this.context2D.fillText(this.draw_calls.toString(), 10, 80);
   }
 }

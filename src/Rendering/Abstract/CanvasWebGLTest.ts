@@ -12,8 +12,13 @@ export abstract class CanvasWebGLTest extends Canvas {
   private palette_indexes: number[] = [];
   private line_heights: number[] = [];
   private offset = 0;
-  private col_group = 3;
+  private col_group = 10;
   private total_height = 0;
+  private bytes_pos = 0;
+
+  //debug
+  protected draw_calls = 0;
+  protected line_array_length = 0;
 
   private uniform_locations = {
     palette: 0,
@@ -40,9 +45,10 @@ export abstract class CanvasWebGLTest extends Canvas {
   public newColumn() {
     const height_of_col = this.total_height % this.size.y;
     if (height_of_col > 0) {
+      throw new Error("AAA")
       const to_add = this.size.y - height_of_col;
       this.total_height += to_add;
-      this.line_heights[this.line_heights.length - 1] += to_add;
+      this.drawVerticalLine(to_add);
       this.checkForEndOfColgroup();
     }
   }
@@ -54,22 +60,27 @@ export abstract class CanvasWebGLTest extends Canvas {
   }
 
 
-  protected drawHorizontalLine(length: number): void {
+  protected drawVerticalLine(length: number): void {
+    if(length > 255){
+      length -= 255;
+      this.drawVerticalLine(255);
+    }
     this.total_height += length;
     let palette_id = this.palette.findIndex(c => distance(c, this.color) < 10);
 
-    //if last draw was same color, juste add length to last length
-    if (this.palette_indexes.length && this.palette_indexes[this.palette_indexes.length - 1] === palette_id) {
-      this.line_heights[this.line_heights.length - 1] += length;
-      return this.checkForEndOfColgroup();
-    }
-    this.line_heights.push(length);
+    if(this.bytes_pos === 0)
+      this.line_heights.push(length);
+    else
+      this.line_heights[this.line_heights.length-1] = this.line_heights[this.line_heights.length-1] << 8 | length
+    
+      this.bytes_pos++;
+    this.bytes_pos %= 4;
+
     if (palette_id < 0) {
       palette_id = this.palette.length;
       this.palette.push({ r: this.color.r, g: this.color.g, b: this.color.b });
     }
     this.palette_indexes.push(palette_id);
-
     this.checkForEndOfColgroup();
   }
 
@@ -77,20 +88,29 @@ export abstract class CanvasWebGLTest extends Canvas {
     this.line_heights = [];
     this.palette_indexes = [];
     this.total_height = 0;
+
+    this.bytes_pos = 0;
     if (!mid_drawing) {
       this.palette = [];
       this.offset = 0;
+      this.draw_calls = 0;
     }
   }
 
   protected finishDrawing() {
     if (this.line_heights.length === 0) return;
+    if(this.bytes_pos > 0){
+      this.line_heights[this.line_heights.length-1] <<= 8 * (4 - this.bytes_pos);
+    }
+    //this.checkIntegrity();
     const gl = this.gl;
-
+    //console.log(this.line_heights);
+    this.line_array_length = this.palette_indexes.length;
+    this.draw_calls++;
     gl.uniform3fv(this.uniform_locations.palette, this.palette.flatMap(c => [c.r, c.g, c.b]));
     gl.uniform1iv(this.uniform_locations.palette_indexes, this.palette_indexes);
-    gl.uniform1iv(this.uniform_locations.line_heights, this.line_heights);
-    gl.uniform1i(this.uniform_locations.offset, this.offset);
+    gl.uniform1uiv(this.uniform_locations.line_heights, this.line_heights);
+    gl.uniform1ui(this.uniform_locations.offset, this.offset);
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
     //gl.drawArrays(gl.LINES, 0, verticesAndColors.length / 5);
   }
@@ -138,7 +158,7 @@ export abstract class CanvasWebGLTest extends Canvas {
 
     //passing resolution data
     gl.uniform2f(this.uniform_locations.resolution, this.size.x, this.size.y);
-    gl.uniform1i(this.uniform_locations.col_group, this.col_group);
+    gl.uniform1ui(this.uniform_locations.col_group, this.col_group);
 
     const numVerts = 4;
     const vertexIds = new Float32Array(numVerts);
@@ -172,16 +192,22 @@ export abstract class CanvasWebGLTest extends Canvas {
     let column_index = 0;
     let index_start_of_col = 0;
     for (let i = 0; i < this.line_heights.length; i++) {
-      acc += this.line_heights[i];
-      if (acc === this.size.y) {
-        acc = 0;
-        column_index++;
-        index_start_of_col = i + 1;
-      } else if (acc > this.size.y) {
-        console.log(this.line_heights.slice(index_start_of_col, i));
-        throw new Error(`Column ${column_index} not cool`);
+      for(let j = 0; j < 4; j++){
+        acc += this.mask(this.line_heights[i], 3-j);
+        if (acc === this.size.y) {
+          acc = 0;
+          column_index++;
+          index_start_of_col = i + 1;
+        } else if (acc > this.size.y) {
+          console.log(this.line_heights.slice(index_start_of_col, i));
+          throw new Error(`Column ${column_index} not cool`);
+        }
       }
     }
+  }
+
+  private mask(value: number, pos: number){
+    return (value >> (pos * 8)) & 255;
   }
 
 }
