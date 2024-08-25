@@ -27,7 +27,7 @@ export abstract class Canvas {
         const id = "canvas_" + Canvas.id++;
         const canvasElement = document.createElement("canvas");
         canvasElement.setAttribute("id", id);
-        canvasElement.setAttribute("style", "border: 3px solid black");
+        canvasElement.setAttribute("style", "border: 3px solid red");
         if(centered)
             canvasElement.classList.add('centered');
         document.getElementById("canvas-container")?.appendChild(canvasElement);

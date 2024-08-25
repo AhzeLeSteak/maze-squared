@@ -4,14 +4,14 @@ import { textures } from "@/Engine/Texture/load_textures";
 import { Color, distance, Texture } from "@/Engine/Texture/Texture";
 import { Orientation, Wall } from "@/Engine/GameMap";
 import { distance_vectors, Lines, Vector2 } from "@/Engine/Geometry/Vector2";
-import { CanvasWebGLTest } from "@/Rendering/Abstract/CanvasWebGLTest";
+import { CanvasWebGL } from "@/Rendering/Abstract/CanvasWebGL";
 
 const SAMPLE_SIZE = 10;
 let tick_index = 0;
 let tick_sum = 0;
 const tick_list = new Array(SAMPLE_SIZE).fill(0);
 
-export class CanvasRaycast extends CanvasWebGLTest {
+export class CanvasRaycast extends CanvasWebGL {
   private shadow_ratio = 0.2;
   private context2D: CanvasRenderingContext2D;
   
