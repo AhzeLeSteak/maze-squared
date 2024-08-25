@@ -15,11 +15,11 @@ export class CanvasImage extends Canvas2D {
       for (let x = 0; x < this.size.x; x++) {
         const data = this.contextd2D.getImageData(x, y, 1, 1).data;
         // array.push(`#${rgbToHex(data[0])}${rgbToHex(data[1])}${rgbToHex(data[2])} `);
-        array.push({
-          r: data[0],
-          g: data[1],
-          b: data[2],
-        });
+        let color = Math.floor(data[0] / 16) << 24;
+        color    |= Math.floor(data[1] / 16) << 16;
+        color    |= Math.floor(data[2] / 16) << 8;
+        color    |= 15;
+        array.push(color)
       }
     }
     return new Texture(array, { ...this.size });

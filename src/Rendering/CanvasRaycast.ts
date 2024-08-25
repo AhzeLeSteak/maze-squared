@@ -5,7 +5,6 @@ import { Color, distance, Texture } from "@/Engine/Texture/Texture";
 import { Orientation, Wall } from "@/Engine/GameMap";
 import { distance_vectors, Lines, Vector2 } from "@/Engine/Geometry/Vector2";
 import { CanvasWebGLTest } from "@/Rendering/Abstract/CanvasWebGLTest";
-import {Canvas2DTest} from "@/Rendering/Abstract/Canvas2DTest";
 
 const SAMPLE_SIZE = 10;
 let tick_index = 0;
@@ -17,7 +16,7 @@ export class CanvasRaycast extends CanvasWebGLTest {
   private context2D: CanvasRenderingContext2D;
   
   constructor(width: number, height: number, canvas: HTMLCanvasElement) {
-    super({ x: width, y: height }, canvas);
+    super({ x: Math.floor(width), y: Math.floor(height) }, canvas);
     this.context2D = this.createCanvas().getContext("2d")!;
     this.resizeCanvasHtml(this.context2D.canvas, { x: this.canvas.width, y: this.canvas.height });
     this.context2D.font = "24px Comic sans";
@@ -82,7 +81,7 @@ export class CanvasRaycast extends CanvasWebGLTest {
 
       
       if (distance(new_color, color) > 5 || dy === m) {
-        this.setColor(color.r / 255, color.g / 255, color.b / 255);
+        this.setColor(color);
         color = new_color;
         //this.drawRectangle(base_x, last_draw_y, col_size_floors, y - last_draw_y);
         this.drawVerticalLine(y - last_draw_y);
@@ -94,7 +93,7 @@ export class CanvasRaycast extends CanvasWebGLTest {
   drawCeiling(base_y: number, lineHeight: number, ray_diff_angle: number, base_x: number, next_wall: Wall) {
     if (lineHeight >= this.size.y) return;
     //draw floor and ceiling
-    let color: Color = { r: 0, g: 0, b: 0 };
+    let color: Color = 0x0000;
     let last_draw_y = 0;
     
     const raFix = Math.cos(ray_diff_angle);
@@ -112,8 +111,8 @@ export class CanvasRaycast extends CanvasWebGLTest {
       ty = Math.floor(ty * floor_tile_size);
       
       const nColor = floor_text.columns[tx & (floor_tile_size - 1)][ty & (floor_tile_size - 1)];
-      if (distance(nColor, color) > 20 || y === base_y) {
-        this.setColor(color.r / 255, color.g / 255, color.b / 255);
+      if (color != nColor || y === base_y) {
+        this.setColor(color);
         color = nColor;
         //this.drawRectangle(base_x, this.size.y - last_draw_y, col_size_floors, this.size.y - y - last_draw_y);
         this.drawVerticalLine(y - last_draw_y);
@@ -128,7 +127,7 @@ export class CanvasRaycast extends CanvasWebGLTest {
     //this.setColor(255, 255, 255);
     //return this.drawVerticalLine(Math.floor((this.size.y - lineHeight) / 2));
     //draw floor and ceiling
-    let color: Color = { r: 0, g: 0, b: 0 };
+    let color = 0x0000;
     let last_draw_y = base_y + lineHeight;
     
     const raFix = Math.cos(ray_diff_angle);
@@ -146,8 +145,8 @@ export class CanvasRaycast extends CanvasWebGLTest {
       ty = Math.floor(ty * floor_tile_size);
       
       const nColor = floor_text.columns[tx & (floor_tile_size - 1)][ty & (floor_tile_size - 1)];
-      if (distance(nColor, color) > 20 || y === this.size.y) {
-        this.setColor(color.r / 255, color.g / 255, color.b / 255);
+      if (color != nColor || y === this.size.y) {
+        this.setColor(color);
         color = nColor;
         //this.drawRectangle(base_x, this.size.y - last_draw_y, col_size_floors, this.size.y - y - last_draw_y);
         this.drawVerticalLine(y - last_draw_y);

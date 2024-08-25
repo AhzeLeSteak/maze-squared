@@ -12,7 +12,7 @@ export abstract class CanvasWebGLTest extends Canvas {
   private palette_indexes: number[] = [];
   private line_heights: number[] = [];
   private offset = 0;
-  private col_group = 10;
+  private col_group = 15;
   private total_height = 0;
   private bytes_pos = 0;
 
@@ -33,7 +33,7 @@ export abstract class CanvasWebGLTest extends Canvas {
     vertexId: 0
   };
 
-  private color: Color = { r: 0, g: 0, b: 0 };
+  private color: Color = 0x000000;
 
 
   protected constructor(size: Vector2, canvas: HTMLCanvasElement) {
@@ -53,10 +53,8 @@ export abstract class CanvasWebGLTest extends Canvas {
     }
   }
 
-  protected setColor(red: number, green: number, blue: number) {
-    this.color.r = red;
-    this.color.g = green;
-    this.color.b = blue;
+  protected setColor(color: Color) {
+    this.color = color;
   }
 
 
@@ -78,7 +76,7 @@ export abstract class CanvasWebGLTest extends Canvas {
 
     if (palette_id < 0) {
       palette_id = this.palette.length;
-      this.palette.push({ r: this.color.r, g: this.color.g, b: this.color.b });
+      this.palette.push(this.color);
     }
     this.palette_indexes.push(palette_id);
     this.checkForEndOfColgroup();
@@ -104,21 +102,21 @@ export abstract class CanvasWebGLTest extends Canvas {
     }
     //this.checkIntegrity();
     const gl = this.gl;
-    //console.log(this.line_heights);
     this.line_array_length = this.palette_indexes.length;
     this.draw_calls++;
-    gl.uniform3fv(this.uniform_locations.palette, this.palette.flatMap(c => [c.r, c.g, c.b]));
-    gl.uniform1iv(this.uniform_locations.palette_indexes, this.palette_indexes);
+    gl.uniform1uiv(this.uniform_locations.palette, this.palette);
+    gl.uniform1uiv(this.uniform_locations.palette_indexes, this.palette_indexes);
     gl.uniform1uiv(this.uniform_locations.line_heights, this.line_heights);
     gl.uniform1ui(this.uniform_locations.offset, this.offset);
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
-    //gl.drawArrays(gl.LINES, 0, verticesAndColors.length / 5);
   }
 
   public async init() {
     const gl = this.gl;
     if (!this.gl)
       throw new Error("WebGL environment could not be created");
+
+
     const vShader = gl.createShader(gl.VERTEX_SHADER);
     if (!vShader) throw new Error("Imposibble de créer le vertex shader");
     const vertexShader = await fetch('assets/shaders/vertex.glsl').then(response => response.text());

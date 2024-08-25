@@ -134,22 +134,28 @@ export class GameMap {
 
     get_next_wall(original_pos: Vector2, angle: number): Wall {
         angle = (angle + two_pi) % two_pi;
-        const points: Lines = [{ ...original_pos }];
+        const points: Lines = [{x: original_pos.x, y: original_pos.y}];
         let t = this.get_tile_from_side_coords(original_pos, angle, true);
         let end = false;
-        const exploration = { v: { ...original_pos }, angle, distance: 0, orientation: Orientation.HORIZONTAL };
+        const exploration: Wall = { 
+            v: {x: original_pos.x, y: original_pos.y },
+            angle,
+            distance: 0,
+            orientation: Orientation.HORIZONTAL, 
+            points, wallCol: 0
+        };
         do {
             if (t.get_next_point(this, exploration, points))
                 break;
             points.push({ ...exploration.v });
             t = this.get_tile_from_side_coords(exploration.v, exploration.angle);
-            end = t.solid === 1 || exploration.distance > 100;
+            end = t.solid === 1 || exploration.distance > 20;
         } while (!end);
 
-        const wallCol = (exploration.orientation === Orientation.HORIZONTAL ? exploration.v.x : exploration.v.y) % 1;
+        exploration.wallCol = (exploration.orientation === Orientation.HORIZONTAL ? exploration.v.x : exploration.v.y) % 1;
 
 
-        return { ...exploration, wallCol, points };
+        return exploration;
     }
 
     get_tile_from_side_coords({ x, y }: Vector2, angle: number, initial = false): Tile {

@@ -1,17 +1,8 @@
 import { Vector2 } from "@/Engine/Geometry/Vector2";
 
-export type Color = {
-  r: number;
-  g: number;
-  b: number;
-};
+export type Color = number;
 
-export const distance = (c1: Color, c2: Color) =>
-  Math.sqrt(
-    (c1.r - c2.r) ** 2 +
-    (c1.g - c2.g) ** 2 +
-    (c1.b - c2.b) ** 2
-  ) * 255;
+export const distance = (c1: Color, c2: Color) => Math.abs(c1 - c2);
 
 export class Texture {
   public readonly columns: Array<Array<Color>>;
