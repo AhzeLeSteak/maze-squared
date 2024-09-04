@@ -7,14 +7,12 @@ export abstract class CanvasWebGL extends Canvas {
 
   protected gl: WebGL2RenderingContext;
   private shaderProgram!: WebGLProgram;
+  private texture: WebGLTexture = null!;
 
   private palette: Color[] = [];
   private palette_indexes: number[] = [];
   private line_heights: number[] = [];
-  private offset = 0;
-  private col_group = 15;
   private total_height = 0;
-  private bytes_pos = 0;
 
   //debug
   protected draw_calls = 0;
@@ -25,8 +23,6 @@ export abstract class CanvasWebGL extends Canvas {
     palette_indexes: 4,
     line_heights: 0,
     resolution: 0,
-    offset: 0,
-    col_group: 0
   };
 
   private attrib_locations = {
@@ -45,11 +41,9 @@ export abstract class CanvasWebGL extends Canvas {
   public newColumn() {
     const height_of_col = this.total_height % this.size.y;
     if (height_of_col > 0) {
-      throw new Error("AAA")
       const to_add = this.size.y - height_of_col;
       this.total_height += to_add;
       this.drawVerticalLine(to_add);
-      this.checkForEndOfColgroup();
     }
   }
 
@@ -59,27 +53,21 @@ export abstract class CanvasWebGL extends Canvas {
 
 
   protected drawVerticalLine(length: number): void {
-    if(length > 255){
+    if(length === 0) return;
+    while(length > 255){
       length -= 255;
       this.drawVerticalLine(255);
     }
     this.total_height += length;
     let palette_id = this.palette.findIndex(c => distance(c, this.color) < 10);
 
-    if(this.bytes_pos === 0)
-      this.line_heights.push(length);
-    else
-      this.line_heights[this.line_heights.length-1] = this.line_heights[this.line_heights.length-1] << 8 | length
-    
-      this.bytes_pos++;
-    this.bytes_pos %= 4;
+    this.line_heights.push(length);
 
     if (palette_id < 0) {
       palette_id = this.palette.length;
       this.palette.push(this.color);
     }
     this.palette_indexes.push(palette_id);
-    this.checkForEndOfColgroup();
   }
 
   protected reset(mid_drawing = false): void {
@@ -87,27 +75,38 @@ export abstract class CanvasWebGL extends Canvas {
     this.palette_indexes = [];
     this.total_height = 0;
 
-    this.bytes_pos = 0;
     if (!mid_drawing) {
       this.palette = [];
-      this.offset = 0;
       this.draw_calls = 0;
     }
   }
 
   protected finishDrawing() {
     if (this.line_heights.length === 0) return;
-    if(this.bytes_pos > 0){
-      this.line_heights[this.line_heights.length-1] <<= 8 * (4 - this.bytes_pos);
-    }
     //this.checkIntegrity();
     const gl = this.gl;
     this.line_array_length = this.palette_indexes.length;
     this.draw_calls++;
     gl.uniform1uiv(this.uniform_locations.palette, this.palette);
     gl.uniform1uiv(this.uniform_locations.palette_indexes, this.palette_indexes);
-    gl.uniform1uiv(this.uniform_locations.line_heights, this.line_heights);
-    gl.uniform1ui(this.uniform_locations.offset, this.offset);
+    //gl.uniform1uiv(this.uniform_locations.line_heights, this.line_heights);
+
+    while(this.line_heights.length % 4 > 0)
+      this.line_heights.push(0);
+    
+    gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      this.line_heights.length / 4, //width
+      1, //height
+      0, //border
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      new Uint8Array(this.line_heights),
+    );
+
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
   }
 
@@ -156,7 +155,6 @@ export abstract class CanvasWebGL extends Canvas {
 
     //passing resolution data
     gl.uniform2f(this.uniform_locations.resolution, this.size.x, this.size.y);
-    gl.uniform1ui(this.uniform_locations.col_group, this.col_group);
 
     const numVerts = 4;
     const vertexIds = new Float32Array(numVerts);
@@ -175,14 +173,14 @@ export abstract class CanvasWebGL extends Canvas {
     gl.bindBuffer(gl.ARRAY_BUFFER, idBuffer);
 
     gl.vertexAttribPointer(this.attrib_locations.vertexId, 1, gl.FLOAT, false, 0, 0);
-  }
 
-  private checkForEndOfColgroup() {
-    if (this.total_height >= this.size.y * this.col_group) {
-      this.finishDrawing();
-      this.offset += this.col_group;
-      this.reset(true);
-    }
+
+    this.texture = gl.createTexture()!;
+    gl.bindTexture(gl.TEXTURE_2D, this.texture);
+
+    console.log(this.texture);
+
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
   }
 
   private checkIntegrity() {
